@@ -1,0 +1,43 @@
+INSERT INTO users (
+  username,
+  password,
+  email,
+  fullName,
+  profilePicture,
+  phoneNumber,
+  registrationDate,
+  lastUpdatedAt,
+  accountStatus,
+  role,
+  permissions,
+  department,
+  reportingManagerId,
+  gender,
+  dateOfBirth,
+  address,
+  country,
+  firstLogin,
+  createdAt,
+  updatedAt
+) VALUES (
+  'adminuser',                          -- username
+  '$2b$10$9Lj.2vuZR/c9dwhufDCHAu4/yb.IQeU.jmpQ7LjzPyCcjJ8zXKyKG',     -- password (nên là hashed, ví dụ bcrypt)
+  'admin@example.com',                  -- email
+  'Admin User',                         -- fullName
+  'https://example.com/profile.jpg',    -- profilePicture (nullable)
+  '+1234567890',                        -- phoneNumber (nullable)
+  NOW(),                                -- registrationDate
+  NOW(),                                -- lastUpdatedAt (nullable)
+  'active',                             -- accountStatus
+  'admin',                              -- role
+  '["create:user", "update:user"]',     -- permissions (JSON string or CSV depending on app logic)
+  'IT Department',                      -- department
+  NULL,                                 -- reportingManagerId (nullable)
+  'Male',                               -- gender
+  '1990-01-01',                         -- dateOfBirth
+  '123 Admin Street',                  -- address
+  'Wonderland',                         -- country
+  false,                                -- firstLogin
+  NOW(),                                -- createdAt
+  NOW()                                 -- updatedAt
+);
