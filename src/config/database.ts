@@ -7,6 +7,7 @@ import DeviceDocumentModel from "../models/devices/deviceDocumentModel";
 import MaintenanceRecordModel from "../models/devices/maintenanceRecordModel";
 import LoginHistoryModel from "../models/loginHistoryModel";
 import InspectionRecordModel from "../models/devices/inspectionRecordModel";
+import TaskModel from "../models/tasks/taskModel";
 
 dotenv.config();
 
@@ -29,7 +30,7 @@ const models = {
   DeviceDocument: DeviceDocumentModel(sequelize),
   MaintenanceRecord: MaintenanceRecordModel(sequelize), 
   InspectionRecord: InspectionRecordModel(sequelize),
-  
+  Task: TaskModel(sequelize)
 };
 
 

@@ -2,9 +2,13 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
+    "outDir": "./dist", // <<< Đây là dòng quan trọng: Chỉ định thư mục output là ./dist
+    "rootDir": "./src",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "forceConsistentCasingInFileNames": true, // Đảm bảo tên file nhất quán
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"]
 }
