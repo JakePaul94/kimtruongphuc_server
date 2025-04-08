@@ -5,15 +5,15 @@ import { ApiError } from "../utils/ApiError";  // Import ApiError
 
 const authController = {
   login: async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const { username, password ,ipaddress,userAgent ,loginTimestamp} = req.body;
-
-    if (!username || !password ) {
+    const { identifier, password ,ipAddress,userAgent ,loginTimestamp} = req.body;
+    console.log('Login request:', req.body);
+    if (!identifier || !password ) {
       console.log('Lỗi:', req.body);
-      throw new ApiError(400, "Username and password are required.");
+      throw new ApiError(400, "Identifier and password are required.");
     }
 
     console.log('Login body:', req.body);
-    const result = await authService.login(username, password ,ipaddress,userAgent,loginTimestamp);
+    const result = await authService.login(identifier, password ,ipAddress,userAgent,loginTimestamp);
 
     if (!result) {
       throw new ApiError(401, "Invalid credentials.");

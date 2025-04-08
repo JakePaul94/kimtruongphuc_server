@@ -8,6 +8,9 @@ import MaintenanceRecordModel from "../models/devices/maintenanceRecordModel";
 import LoginHistoryModel from "../models/loginHistoryModel";
 import InspectionRecordModel from "../models/devices/inspectionRecordModel";
 import TaskModel from "../models/tasks/taskModel";
+import BoilerModel from "../models/boilers/boilerModel";
+import BoilerUserModel from "../models/boilers/boilerUserModel";
+import BoilerDeviceModel from "../models/boilers/boilerDeviceModel";
 
 dotenv.config();
 
@@ -24,15 +27,18 @@ const sequelize = new Sequelize(
 );
 
 const models = {
-  User: UserModel(sequelize),LoginHistory:LoginHistoryModel(sequelize),
+  User: UserModel(sequelize),
+  LoginHistory: LoginHistoryModel(sequelize),
   RefreshToken: RefreshTokenModel(sequelize),
   Device: DeviceModel(sequelize),
   DeviceDocument: DeviceDocumentModel(sequelize),
-  MaintenanceRecord: MaintenanceRecordModel(sequelize), 
+  MaintenanceRecord: MaintenanceRecordModel(sequelize),
   InspectionRecord: InspectionRecordModel(sequelize),
-  Task: TaskModel(sequelize)
+  Task: TaskModel(sequelize),
+  Boiler: BoilerModel(sequelize),
+  BoilerUser: BoilerUserModel(sequelize),
+  BoilerDevice: BoilerDeviceModel(sequelize),
 };
-
 
 Object.keys(models).forEach((modelName) => {
   if ((models as any)[modelName].associate) {
