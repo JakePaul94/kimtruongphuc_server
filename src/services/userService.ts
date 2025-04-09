@@ -1,20 +1,23 @@
 import { models } from "../config/database";
 import bcrypt from "bcrypt";
-import { ApiError } from "../utils/ApiError";  // Import ApiError
+import { ApiError } from "../utils/ApiError"; // Import ApiError
 const User = models.User;
 
 const userService = {
   getAllUsersWithManagers: async () => {
     try {
       const users = await User.findAll({
+        attributes: ["id", "fullName", "email", "phoneNumber"], 
         include: [
           {
             model: User,
             as: "Manager",
-            attributes: ["id", "fullName", "email", "username"],
+            attributes: ["id", "fullName", "email", "phoneNumber"], 
           },
         ],
       });
+      const plainUsers = users.map((user) => user.get({ plain: true }));
+      console.log(plainUsers);
       return users;
     } catch (error: any) {
       console.error("Error fetching users with managers:", error);
@@ -29,7 +32,7 @@ const userService = {
           {
             model: User,
             as: "Manager",
-            attributes: ["id", "fullName", "email", "username"],
+            attributes: ["id", "fullName", "email"],
           },
         ],
       });
@@ -42,7 +45,23 @@ const userService = {
       throw new ApiError(500, "Failed to fetch user.");
     }
   },
-
+  getAllUsersByBoilerId: async (boilerId: number) => {
+    try {
+      const users = await User.findAll({
+        include: [
+          {
+            model: BoilerUser,
+            as: 'boilerUsers',
+            where: { boilerId },
+            attributes: [], // không lấy trường của BoilerUser
+          },
+        ],
+      });
+      return users;
+    } catch (error) {
+      throw new Error('Failed to fetch users by boilerId');
+    }
+  },
   createUser: async (userData: any) => {
     try {
       const saltRounds = 10;

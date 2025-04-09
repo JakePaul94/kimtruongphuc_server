@@ -2,12 +2,12 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('maintenanceTaskItems', {
+    await queryInterface.createTable('maintenance_task_items', {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       taskId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'maintenanceTasks', key: 'id' },
+        references: { model: 'maintenance_tasks', key: 'id' },
         onDelete: 'CASCADE',
       },
       title: { type: Sequelize.STRING, allowNull: false },
@@ -19,6 +19,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('maintenanceTaskItems');
+    await queryInterface.dropTable('maintenance_task_items');
   },
 };

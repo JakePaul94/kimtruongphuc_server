@@ -50,7 +50,7 @@ import {
         },
       },
       {
-        tableName: "maintenanceTemplates",
+        tableName: "maintenance_templates",
         timestamps: true,
       }
     );

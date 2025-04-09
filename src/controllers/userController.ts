@@ -45,7 +45,6 @@ const userController = {
       const userData = req.body;
 
       if (
-        !userData.username ||
         !userData.password ||
         !userData.email ||
         !userData.fullName
@@ -54,8 +53,9 @@ const userController = {
       }
 
       if (req.file) {
-        filePath = req.file.path;
-        userData.profilePicture = req.file.path;
+        const fileName = req.file.filename;
+        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+        userData.profilePicture = fileUrl;
       }
 
       const newUser = await userService.createUser(userData);

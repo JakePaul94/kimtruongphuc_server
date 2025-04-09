@@ -50,7 +50,7 @@ const LoginHistoryModel = (sequelize: Sequelize) => {
       reason: { type: DataTypes.TEXT, allowNull: true },
     },
     {
-      tableName: "loginHistory",
+      tableName: "login_history",
       timestamps: true,
     }
   );

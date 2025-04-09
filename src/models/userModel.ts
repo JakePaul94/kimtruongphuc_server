@@ -1,5 +1,13 @@
 import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize";
-import { RefreshTokenInstance } from "./refreshTokenModel";
+
+export type UserRole =
+  | "admin"
+  | "director"
+  | "hr"
+  | "engineer"
+  | "office_staff"
+  | "boiler_manager"
+  | "boiler_worker";
 
 export interface UserAttributes {
   id: number;
@@ -10,8 +18,8 @@ export interface UserAttributes {
   phoneNumber?: string | null;
   registrationDate: Date;
   lastUpdatedAt?: Date | null;
-  accountStatus: string;
-  role: string;
+  accountStatus: "active" | "inactive" | "suspended";
+  role: UserRole;
   permissions?: string | null;
   department?: string | null;
   reportingManagerId?: number | null;
@@ -49,14 +57,22 @@ const UserModel = (sequelize: Sequelize) => {
       },
       lastUpdatedAt: { type: DataTypes.DATE, allowNull: true },
       accountStatus: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM("active", "inactive", "suspended"),
         allowNull: false,
         defaultValue: "active",
       },
       role: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM(
+          "admin",
+          "director",
+          "hr",
+          "engineer",
+          "office_staff",
+          "boiler_manager",
+          "boiler_worker"
+        ),
         allowNull: false,
-        defaultValue: "employee",
+        defaultValue: "office_staff",
       },
       permissions: { type: DataTypes.TEXT, allowNull: true },
       department: { type: DataTypes.STRING, allowNull: true },
@@ -81,18 +97,97 @@ const UserModel = (sequelize: Sequelize) => {
     }
   );
 
-  // 🛠 Thêm association vào model
-  (User as any).associate = (models: { RefreshToken: ModelStatic<Model> }) => {
+  (User as any).associate = (models: {
+    RefreshToken: ModelStatic<Model>;
+    User: ModelStatic<Model>;
+    Boiler: ModelStatic<Model>;
+    LoginHistory: ModelStatic<Model>;
+    CleaningTask: ModelStatic<Model>;
+    MaintenanceTask: ModelStatic<Model>;
+    InspectionTask: ModelStatic<Model>;
+    AdHocTask: ModelStatic<Model>;
+    AdHocTaskLog: ModelStatic<Model>;
+    IncidentReport: ModelStatic<Model>;
+    CleaningTemplate: ModelStatic<Model>;
+    CleaningTaskLocation: ModelStatic<Model>;
+    MaintenanceTaskItem: ModelStatic<Model>;
+    IncidentReportPhoto: ModelStatic<Model>;
+    BoilerUser: ModelStatic<Model>;
+  }) => {
     User.hasMany(models.RefreshToken, {
       foreignKey: "userId",
       as: "refreshTokens",
       onDelete: "CASCADE",
     });
 
-    User.belongsTo(User, { as: "Manager", foreignKey: "reportingManagerId" });
+    // Quan hệ với chính User (Manager và Subordinates)
+    User.belongsTo(User, {
+      as: "Manager",
+      foreignKey: "reportingManagerId",
+    });
+
     User.hasMany(User, {
       as: "Subordinates",
       foreignKey: "reportingManagerId",
+    });
+
+    User.hasMany(models.CleaningTask, {
+      foreignKey: "createdBy",
+      as: "createdCleaningTasks",
+    });
+    User.hasMany(models.AdHocTask, {
+      foreignKey: "createdBy",
+      as: "createdAdHocTasks",
+    });
+
+    User.hasMany(models.InspectionTask, {
+      foreignKey: "createdBy",
+      as: "createdInspectionTasks",
+    });
+
+    User.hasMany(models.MaintenanceTask, {
+      foreignKey: "createdBy",
+      as: "createdMaintenanceTasks",
+    });
+
+    User.hasMany(models.CleaningTask, {
+      foreignKey: "assignedUserId",
+      as: "assignedCleaningTasks",
+    });
+
+    // Inspection Tasks
+    User.hasMany(models.InspectionTask, {
+      foreignKey: "assignedTo",
+      as: "assignedInspectionTasks",
+    });
+    // Ad Hoc Tasks - người được giao task
+    User.hasMany(models.AdHocTask, {
+      foreignKey: "assignedUserId",
+      as: "adHocTasks",
+    });
+
+    // Ad Hoc Task Logs - người ghi log
+    User.hasMany(models.AdHocTaskLog, {
+      foreignKey: "userId",
+      as: "adHocTaskLogs",
+    });
+    // Incident Reports - người báo cáo
+    User.hasMany(models.IncidentReport, {
+      foreignKey: "reporterId",
+      as: "incidentReports",
+    });
+    User.hasMany(models.BoilerUser, {
+      foreignKey: "userId",
+      as: "boilerUsers",
+    });
+    // Login History
+    User.hasMany(models.LoginHistory, {
+      foreignKey: "userId",
+      as: "loginHistory",
+    });
+    User.hasMany(models.MaintenanceTask, {
+      foreignKey: "assignedTo",
+      as: "assignedMaintenanceTasks",
     });
   };
 

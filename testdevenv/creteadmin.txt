@@ -1,5 +1,4 @@
 INSERT INTO users (
-  username,
   password,
   email,
   fullName,
@@ -20,12 +19,11 @@ INSERT INTO users (
   createdAt,
   updatedAt
 ) VALUES (
-  'adminuser',                          -- username
   '$2b$10$9Lj.2vuZR/c9dwhufDCHAu4/yb.IQeU.jmpQ7LjzPyCcjJ8zXKyKG',     -- password (nên là hashed, ví dụ bcrypt)
-  'admin@example.com',                  -- email
+  'admin@x.com',                  -- email
   'Admin User',                         -- fullName
-  'https://example.com/profile.jpg',    -- profilePicture (nullable)
-  '+1234567890',                        -- phoneNumber (nullable)
+  'http://localhost:3000/uploads/avatars/admin.jpg',    -- profilePicture (nullable)
+  '1234567890',                        -- phoneNumber (nullable)
   NOW(),                                -- registrationDate
   NOW(),                                -- lastUpdatedAt (nullable)
   'active',                             -- accountStatus

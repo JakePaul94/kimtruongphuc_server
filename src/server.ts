@@ -4,11 +4,17 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import userRoutes from "./routes/userRouter";
-import { sequelize } from "./config/database";
 import authRouter from "./routes/authRouter";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import deviceRouter from "./routes/deviceRouter";
-import taskRouter from "./routes/taskRouter";
+import boilerRouter from "./routes/boilerRouter";
+import maintenanceRouter from "./routes/tasks/maintenanceRoutes";
+import inspectionRouter from "./routes/tasks/inspectionRouter";
+import adHocTaskRouter from "./routes/tasks/adHocTaskRouter";
+import cleaningRouter from "./routes/tasks/cleaningRouter";
+import incidentRouter from "./routes/incidentReport.routes";
+import path from "path";
+
 dotenv.config();
 
 const app = express();
@@ -19,10 +25,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
 app.use("/users", userRoutes);
 app.use("/auth", authRouter);
 app.use("/devices", deviceRouter);
-app.use("/tasks", taskRouter);
+app.use("/boilers", boilerRouter);
+app.use("/maintenance-tasks", maintenanceRouter);
+app.use("/inspection-tasks", inspectionRouter);
+app.use("/ad-hoc-tasks", adHocTaskRouter);
+app.use("/cleaning-tasks", cleaningRouter);
+app.use("/incident-reports", incidentRouter); 
+
 app.get("/", (req, res) => {
   res.send("Hello World with Express, TypeScript, Sequelize!");
 });

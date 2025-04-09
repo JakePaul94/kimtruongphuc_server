@@ -27,6 +27,16 @@ module.exports = {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },
+      boiler_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'boilers',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
       model: Sequelize.STRING(100),
       brand: Sequelize.STRING(100),
       origin: Sequelize.STRING(100),

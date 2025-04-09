@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 export interface BoilerDeviceAttributes {
   id: number;
@@ -6,7 +6,15 @@ export interface BoilerDeviceAttributes {
   deviceId: number;
 }
 
-export interface BoilerDeviceInstance extends Model<BoilerDeviceAttributes>, BoilerDeviceAttributes {}
+
+
+export interface BoilerDeviceCreationAttributes
+  extends Optional<BoilerDeviceAttributes, 'id'> {}
+
+
+export interface BoilerDeviceInstance
+  extends Model<BoilerDeviceAttributes, BoilerDeviceCreationAttributes>,
+    BoilerDeviceAttributes {}
 
 const BoilerDeviceModel = (sequelize: Sequelize) => {
   const BoilerDevice = sequelize.define<BoilerDeviceInstance>('BoilerDevice', {

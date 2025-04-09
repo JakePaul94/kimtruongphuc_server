@@ -2,12 +2,12 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('inspectionTemplateItems', {
+    await queryInterface.createTable('inspection_templates_items', {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       templateId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'inspectionTemplates', key: 'id' },
+        references: { model: 'inspection_templates', key: 'id' },
         onDelete: 'CASCADE',
       },
       title: { type: Sequelize.STRING, allowNull: false },
@@ -18,6 +18,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('inspectionTemplateItems');
+    await queryInterface.dropTable('inspection_templates_items');
   },
 };

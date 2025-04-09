@@ -11,19 +11,41 @@ module.exports = {
       adHocTaskId: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'ad_hoc_tasks',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdBy: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       note: {
         type: Sequelize.TEXT,
+        allowNull: true,
       },
       photoUrl: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
     });
   },
 

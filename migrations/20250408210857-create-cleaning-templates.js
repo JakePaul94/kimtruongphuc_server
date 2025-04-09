@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('CleaningTemplates', {
+    await queryInterface.createTable('cleaning_templates', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Boilers',
+          model: 'boilers',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -32,6 +32,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('CleaningTemplates');
+    await queryInterface.dropTable('cleaning_templates');
   },
 };

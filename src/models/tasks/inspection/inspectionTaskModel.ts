@@ -1,17 +1,19 @@
 import { DataTypes, Sequelize, Model, ModelStatic } from 'sequelize';
-import { InspectionTaskItemInstance } from './inspectionTaskItemModel';
 
 export interface InspectionTaskAttributes {
   id: number;
   deviceId: number;
   templateId?: number | null;
   assignedTo?: number | null;
-  status: string; // 'pending' | 'in_progress' | 'completed'
+  createdBy: number;
+  status: string;
   scheduledDate: Date;
   completedAt?: Date | null;
 }
 
-export interface InspectionTaskInstance extends Model<InspectionTaskAttributes>, InspectionTaskAttributes {
+export interface InspectionTaskInstance
+  extends Model<InspectionTaskAttributes>,
+    InspectionTaskAttributes {
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -24,6 +26,7 @@ const InspectionTaskModel = (sequelize: Sequelize) => {
       deviceId: { type: DataTypes.INTEGER, allowNull: false },
       templateId: { type: DataTypes.INTEGER, allowNull: true },
       assignedTo: { type: DataTypes.INTEGER, allowNull: true },
+      createdBy: { type: DataTypes.INTEGER, allowNull: false },
       status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'pending' },
       scheduledDate: { type: DataTypes.DATE, allowNull: false },
       completedAt: { type: DataTypes.DATE, allowNull: true },
@@ -46,20 +49,10 @@ const InspectionTaskModel = (sequelize: Sequelize) => {
       onDelete: 'CASCADE',
     });
 
-    InspectionTask.belongsTo(models.User, {
-      foreignKey: 'assignedTo',
-      as: 'assignee',
-    });
-
-    InspectionTask.belongsTo(models.Device, {
-      foreignKey: 'deviceId',
-      as: 'device',
-    });
-
-    InspectionTask.belongsTo(models.InspectionTemplate, {
-      foreignKey: 'templateId',
-      as: 'template',
-    });
+    InspectionTask.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assignee' });
+    InspectionTask.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
+    InspectionTask.belongsTo(models.Device, { foreignKey: 'deviceId', as: 'device' });
+    InspectionTask.belongsTo(models.InspectionTemplate, { foreignKey: 'templateId', as: 'template' });
   };
 
   return InspectionTask;

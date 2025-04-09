@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize } from "sequelize";
+import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize";
 
 export interface BoilerAttributes {
   id: number;
@@ -25,16 +25,35 @@ const BoilerModel = (sequelize: Sequelize) => {
       timestamps: true,
     }
   );
-  (Boiler as any).associate = (models: any) => {
+  (Boiler as any).associate = (models: {
+    BoilerUser: ModelStatic<Model>;
+    BoilerDevice: ModelStatic<Model>;
+    CleaningTask: ModelStatic<Model>;
+    MaintenanceTask: ModelStatic<Model>;
+    InspectionTask: ModelStatic<Model>;
+    AdHocTask: ModelStatic<Model>;
+  }) => {
     Boiler.hasMany(models.BoilerUser, {
       foreignKey: "boilerId",
       as: "users",
       onDelete: "CASCADE",
     });
-
+  
     Boiler.hasMany(models.BoilerDevice, {
       foreignKey: "boilerId",
       as: "devices",
+      onDelete: "CASCADE",
+    });
+  
+    Boiler.hasMany(models.CleaningTask, {
+      foreignKey: "boilerId",
+      as: "cleaningTasks",
+      onDelete: "CASCADE",
+    });
+  
+    Boiler.hasMany(models.AdHocTask, {
+      foreignKey: "boilerId",
+      as: "adHocTasks",
       onDelete: "CASCADE",
     });
   };

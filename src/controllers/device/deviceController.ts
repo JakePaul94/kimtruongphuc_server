@@ -1,111 +1,117 @@
-import { Request, Response, NextFunction } from 'express';
-import { deviceService } from '../../services/devices/deviceService';
-import { ApiError } from '../../utils/ApiError'; // Giả sử đường dẫn đúng
+import { Request, Response, NextFunction } from "express";
+import { deviceService } from "../../services/devices/deviceService";
+import { ApiError } from "../../utils/ApiError";
 
 export const deviceController = {
-    // POST /devices
-    createDevice: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const newDevice = await deviceService.createDevice(req.body); // Sử dụng value nếu có validation
-            res.status(201).json(newDevice);
-        } catch (error) {
-            next(error); 
-        }
-    },
+  createDevice: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const device = await deviceService.createDevice(req.body);
+      res.status(201).json(device);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    // GET /devices
-    getAllDevices: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            // Lấy các tham số phân trang, lọc, sắp xếp từ query string
-            const { limit, offset, order, ...filter } = req.query;
+  getAllDevices: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { limit, offset, order, ...filter } = req.query;
+      const result = await deviceService.getAllDevices({
+        limit: limit ? parseInt(limit as string) : undefined,
+        offset: offset ? parseInt(offset as string) : undefined,
+        order: order ? JSON.parse(order as string) : undefined,
+        filter: filter as any,
+      });
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-            const limitNum = limit ? parseInt(limit as string, 10) : undefined;
-            const offsetNum = offset ? parseInt(offset as string, 10) : undefined;
+  getDeviceById: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = parseInt(req.params.id);
+      const device = await deviceService.getDeviceById(id);
+      if (!device) {
+        throw new ApiError(404, "Không tìm thấy thiết bị");
+      }
+      res.json(device);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-            // Xử lý order (ví dụ: ?order=deviceName:ASC,createdAt:DESC)
-            let orderArray: Array<[string, string]> | undefined;
-            if (typeof order === 'string') {
-                orderArray = order.split(',').map(pair => {
-                    const [field, direction = 'ASC'] = pair.split(':');
-                    return [field, direction.toUpperCase()];
-                }) as Array<[string, string]>;
-            }
+  updateDevice: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updated = await deviceService.updateDevice(id, req.body);
+      if (!updated) {
+        throw new ApiError(404, "Không tìm thấy thiết bị để cập nhật");
+      }
+      res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-            // Xây dựng options cho service
-            const options = {
-                filter: filter, // Truyền các tham số lọc còn lại
-                limit: limitNum,
-                offset: offsetNum,
-                order: orderArray,
-                // Có thể thêm include từ query nếu cần
-            };
+  deleteDevice: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = parseInt(req.params.id);
+      await deviceService.deleteDeviceById(id);
+      res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  },
 
-            const result = await deviceService.getAllDevices(options);
-            res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+  getSubDevices: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const parentId = parseInt(req.params.id);
+      const subs = await deviceService.getSubDevices(parentId);
+      res.json(subs);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    // GET /devices/:id
-    getDeviceById: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const id = parseInt(req.params.id, 10);
-            if (isNaN(id)) {
-                 throw new ApiError(400, 'ID thiết bị không hợp lệ');
-            }
-            // Có thể lấy include options từ query string nếu muốn linh hoạt
-            // Ví dụ: ?include=subDevices,maintenanceRecords
-            const device = await deviceService.getDeviceById(id /*, includeOptions */);
-            if (!device) {
-                throw new ApiError(404, 'Không tìm thấy thiết bị');
-            }
-            res.status(200).json(device);
-        } catch (error) {
-            next(error);
-        }
-    },
+  getDeviceMaintenanceTasks: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const deviceId = parseInt(req.params.id);
+      const records = await deviceService.getDeviceMaintenanceTasks(deviceId);
+      res.json(records);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    // PUT /devices/:id  (Hoặc PATCH)
-    updateDevice: async (req: Request, res: Response, next: NextFunction) => {
-         // >>> TODO: Thêm validation cho req.body <<<
-        try {
-            const id = parseInt(req.params.id, 10);
-             if (isNaN(id)) {
-                 throw new ApiError(400, 'ID thiết bị không hợp lệ');
-            }
-            const updatedDevice = await deviceService.updateDevice(id, req.body);
-            res.status(200).json(updatedDevice);
-        } catch (error) {
-            next(error);
-        }
-    },
+  getDeviceInspectionTasks: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const deviceId = parseInt(req.params.id);
+      const records = await deviceService.getDeviceInspectionTasks(deviceId);
+      res.json(records);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    // DELETE /devices/:id
-    deleteDevice: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const id = parseInt(req.params.id, 10);
-             if (isNaN(id)) {
-                 throw new ApiError(400, 'ID thiết bị không hợp lệ');
-            }
-            await deviceService.deleteDeviceById(id);
-            res.status(204).send(); // No Content
-        } catch (error) {
-            next(error);
-        }
-    },
-
-     // GET /devices/:id/subDevices (Ví dụ thêm)
-    getSubDevices: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const parentId = parseInt(req.params.id, 10);
-             if (isNaN(parentId)) {
-                 throw new ApiError(400, 'ID thiết bị cha không hợp lệ');
-            }
-            const subDevices = await deviceService.getSubDevices(parentId);
-            res.status(200).json(subDevices);
-        } catch (error) {
-            next(error);
-        }
-    },
+  getDeviceDocuments: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const deviceId = parseInt(req.params.id);
+      const docs = await deviceService.getDeviceDocuments(deviceId);
+      res.json(docs);
+    } catch (err) {
+      next(err);
+    }
+  },
 };

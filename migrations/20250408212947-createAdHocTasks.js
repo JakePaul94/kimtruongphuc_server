@@ -11,10 +11,42 @@ module.exports = {
       deviceId: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'devices',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
+      boilerId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'boilers',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       assignedTo: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
+      createdBy: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       title: {
         type: Sequelize.STRING,
@@ -22,14 +54,27 @@ module.exports = {
       },
       description: {
         type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      scheduledDate: {
+        type: Sequelize.DATE,
+        allowNull: false,
       },
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM('pending', 'in_progress', 'done'),
         allowNull: false,
         defaultValue: 'pending',
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
     });
   },
 

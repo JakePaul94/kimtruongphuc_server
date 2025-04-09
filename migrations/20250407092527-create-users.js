@@ -1,45 +1,70 @@
 "use strict";
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("users", {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      username: { type: Sequelize.STRING, allowNull: false, unique: true },
+
       password: { type: Sequelize.STRING, allowNull: false },
-      email: { type: Sequelize.STRING, allowNull: false, unique: true },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
       fullName: { type: Sequelize.STRING, allowNull: false },
-      profilePicture: { type: Sequelize.STRING },
-      phoneNumber: { type: Sequelize.STRING },
+      profilePicture: { type: Sequelize.STRING, allowNull: true },
+      phoneNumber: { type: Sequelize.STRING, allowNull: true },
+
       registrationDate: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.NOW,
       },
-      lastUpdatedAt: { type: Sequelize.DATE },
+      lastUpdatedAt: { type: Sequelize.DATE, allowNull: true },
+
       accountStatus: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM("active", "inactive", "suspended"),
         allowNull: false,
         defaultValue: "active",
       },
       role: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM(
+          "admin",
+          "director",
+          "hr",
+          "engineer",
+          "office_staff",
+          "boiler_manager",
+          "boiler_worker"
+        ),
         allowNull: false,
-        defaultValue: "employee",
+        defaultValue: "office_staff",
       },
-      permissions: { type: Sequelize.TEXT },
-      department: { type: Sequelize.STRING },
+      permissions: { type: Sequelize.TEXT, allowNull: true },
+      department: { type: Sequelize.STRING, allowNull: true },
+
       reportingManagerId: {
         type: Sequelize.INTEGER,
-        references: { model: "users", key: "id" },
+        allowNull: true,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
       },
-      gender: { type: Sequelize.STRING(10) },
-      dateOfBirth: { type: Sequelize.DATEONLY },
-      address: { type: Sequelize.STRING },
-      country: { type: Sequelize.STRING },
+
+      gender: { type: Sequelize.STRING(10), allowNull: true },
+      dateOfBirth: { type: Sequelize.DATEONLY, allowNull: true },
+      address: { type: Sequelize.STRING, allowNull: true },
+      country: { type: Sequelize.STRING, allowNull: true },
+
       firstLogin: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
+
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -52,7 +77,19 @@ module.exports = {
       },
     });
   },
+
   down: async (queryInterface) => {
-    await queryInterface.dropTable("users");
+    // Xoá ENUMs trước khi drop bảng để tránh lỗi Postgres
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.dropTable("users", { transaction });
+      await queryInterface.sequelize.query(
+        `DROP TYPE IF EXISTS "enum_users_accountStatus";`,
+        { transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TYPE IF EXISTS "enum_users_role";`,
+        { transaction }
+      );
+    });
   },
 };

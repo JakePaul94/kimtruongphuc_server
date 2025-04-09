@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('CleaningTasks', {
+    await queryInterface.createTable('cleaning_tasks', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'CleaningTemplates',
+          model: 'cleaning_templates',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Boilers',
+          model: 'boilers',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -31,10 +31,23 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'id',
         },
         onDelete: 'SET NULL',
+      },
+      createdBy: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+      },
+      date: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       status: {
         type: Sequelize.STRING,
@@ -55,6 +68,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('CleaningTasks');
+    await queryInterface.dropTable('cleaning_tasks');
   },
 };
