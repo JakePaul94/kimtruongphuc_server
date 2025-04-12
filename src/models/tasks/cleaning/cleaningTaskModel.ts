@@ -1,24 +1,30 @@
-import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize";
+import { DataTypes, Model, ModelStatic, Optional, Sequelize } from "sequelize";
 import { CleaningTaskLocationInstance } from "./cleaningTaskLocationModel";
+import { TaskStatusType } from "../../../types/taskStatusType";
 
 export interface CleaningTaskAttributes {
   id: number;
   templateId: number;
   boilerId: number;
   createdBy?: number;
-  assignedUserId?: number | null;
-  date: string;
-  status: string;
+  assignedTo?: number | null;
+  status:TaskStatusType;
   scheduledDate: Date;
   completedAt?: Date | null;
 }
 
+export interface CleaningTaskCreationAttributes
+  extends Optional<
+    CleaningTaskAttributes,
+    'id' | 'status' | 'createdBy' | 'assignedTo' | 'completedAt'
+  > {}
+
 export interface CleaningTaskInstance
-  extends Model<CleaningTaskAttributes>,
+  extends Model<CleaningTaskAttributes, CleaningTaskCreationAttributes>,
     CleaningTaskAttributes {
   createdAt?: Date;
   updatedAt?: Date;
-  locations?: CleaningTaskLocationInstance[]; // 👈 thêm dòng này để dùng được task.locations
+  locations?: CleaningTaskLocationInstance[];
 }
 
 const CleaningTaskModel = (sequelize: Sequelize) => {
@@ -31,13 +37,21 @@ const CleaningTaskModel = (sequelize: Sequelize) => {
       createdBy: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        references: { model: 'users', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
       },
-      assignedUserId: { type: DataTypes.INTEGER, allowNull: true },
-      date: { type: DataTypes.DATEONLY, allowNull: false },
+      assignedTo: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: { model: 'users', key: 'id' },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      },
       status: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('pending', 'in_process', 'completed', 'canceled'),
         allowNull: false,
-        defaultValue: "pending", // pending | in_progress | completed
+        defaultValue: "pending",
       },
       scheduledDate: { type: DataTypes.DATEONLY, allowNull: false },
       completedAt: { type: DataTypes.DATE, allowNull: true },
@@ -58,22 +72,22 @@ const CleaningTaskModel = (sequelize: Sequelize) => {
       foreignKey: "templateId",
       as: "template",
     });
-    CleaningTask.hasMany(models.CleaningTaskLocation, {
-        foreignKey: 'taskId',
-        as: 'locations',
-        onDelete: 'CASCADE',
-      });
     CleaningTask.belongsTo(models.Boiler, {
       foreignKey: "boilerId",
       as: "boiler",
     });
     CleaningTask.belongsTo(models.User, {
-        foreignKey: "createdBy",
-        as: "creator",
-      });
+      foreignKey: "createdBy",
+      as: "creator",
+    });
     CleaningTask.belongsTo(models.User, {
-      foreignKey: "assignedUserId",
+      foreignKey: "assignedTo",
       as: "assignedUser",
+    });
+    CleaningTask.hasMany(models.CleaningTaskLocation, {
+      foreignKey: "taskId",
+      as: "locations",
+      onDelete: "CASCADE",
     });
   };
 

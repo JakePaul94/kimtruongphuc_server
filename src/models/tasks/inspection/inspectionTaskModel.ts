@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize, Model, ModelStatic } from 'sequelize';
+import { DataTypes, Sequelize, Model, ModelStatic } from "sequelize";
+import { TaskStatusType } from "../../../types/taskStatusType";
 
 export interface InspectionTaskAttributes {
   id: number;
@@ -6,7 +7,7 @@ export interface InspectionTaskAttributes {
   templateId?: number | null;
   assignedTo?: number | null;
   createdBy: number;
-  status: string;
+  status: TaskStatusType;
   scheduledDate: Date;
   completedAt?: Date | null;
 }
@@ -20,19 +21,23 @@ export interface InspectionTaskInstance
 
 const InspectionTaskModel = (sequelize: Sequelize) => {
   const InspectionTask = sequelize.define<InspectionTaskInstance>(
-    'InspectionTask',
+    "InspectionTask",
     {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       deviceId: { type: DataTypes.INTEGER, allowNull: false },
       templateId: { type: DataTypes.INTEGER, allowNull: true },
       assignedTo: { type: DataTypes.INTEGER, allowNull: true },
       createdBy: { type: DataTypes.INTEGER, allowNull: false },
-      status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'pending' },
+      status: {
+        type: DataTypes.ENUM("pending", "in_process", "completed", "canceled"),
+        allowNull: false,
+        defaultValue: "pending",
+      },
       scheduledDate: { type: DataTypes.DATE, allowNull: false },
       completedAt: { type: DataTypes.DATE, allowNull: true },
     },
     {
-      tableName: 'inspection_tasks',
+      tableName: "inspection_tasks",
       timestamps: true,
     }
   );
@@ -44,15 +49,27 @@ const InspectionTaskModel = (sequelize: Sequelize) => {
     InspectionTemplate: ModelStatic<Model>;
   }) => {
     InspectionTask.hasMany(models.InspectionTaskItem, {
-      foreignKey: 'taskId',
-      as: 'items',
-      onDelete: 'CASCADE',
+      foreignKey: "taskId",
+      as: "items",
+      onDelete: "CASCADE",
     });
 
-    InspectionTask.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assignee' });
-    InspectionTask.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
-    InspectionTask.belongsTo(models.Device, { foreignKey: 'deviceId', as: 'device' });
-    InspectionTask.belongsTo(models.InspectionTemplate, { foreignKey: 'templateId', as: 'template' });
+    InspectionTask.belongsTo(models.User, {
+      foreignKey: "assignedTo",
+      as: "assignee",
+    });
+    InspectionTask.belongsTo(models.User, {
+      foreignKey: "createdBy",
+      as: "creator",
+    });
+    InspectionTask.belongsTo(models.Device, {
+      foreignKey: "deviceId",
+      as: "device",
+    });
+    InspectionTask.belongsTo(models.InspectionTemplate, {
+      foreignKey: "templateId",
+      as: "template",
+    });
   };
 
   return InspectionTask;

@@ -10,12 +10,7 @@ const Device = models.Device;
 const boilerService = {
   getAllBoilers: async () => {
     try {
-      const boilers = await Boiler.findAll({
-        include: [
-          { model: User, as: "users" },
-          { model: Device, as: "devices" },
-        ],
-      });
+      const boilers = await Boiler.findAll();
       return boilers;
     } catch (error: any) {
       console.error("Error fetching boilers:", error);
@@ -27,8 +22,8 @@ const boilerService = {
     try {
       const boiler = await Boiler.findByPk(id, {
         include: [
-          { model: User, as: "users" },
-          { model: Device, as: "devices" },
+          { model: BoilerUser, as: "users" },
+          { model: BoilerDevice, as: "devices" },
         ],
       });
       if (!boiler) {
@@ -40,7 +35,21 @@ const boilerService = {
       throw new ApiError(500, "Failed to fetch boiler.");
     }
   },
-
+  getBoilerIdByUserId: async (userId: number) => {
+    try {
+      const boiler = await BoilerUser.findOne({
+        where: { userId },
+        include: [{ model: Boiler, as: "boiler" }],
+      });
+      if (!boiler) {
+        throw new ApiError(404, `Boiler for user ID ${userId} not found.`);
+      }
+      return boiler.boilerId;
+    } catch (error: any) {
+      console.error(`Error fetching boiler for user ID ${userId}:`, error);
+      throw new ApiError(500, "Failed to fetch boiler.");
+    }
+  },
   createBoiler: async (data: any) => {
     try {
       return await Boiler.create(data);
@@ -113,7 +122,9 @@ const boilerService = {
 
   removeDeviceFromBoiler: async (boilerId: number, deviceId: number) => {
     try {
-      const deleted = await BoilerDevice.destroy({ where: { boilerId, deviceId } });
+      const deleted = await BoilerDevice.destroy({
+        where: { boilerId, deviceId },
+      });
       if (!deleted) throw new ApiError(404, "Device not found in boiler.");
     } catch (error: any) {
       console.error("Error removing device from boiler:", error);

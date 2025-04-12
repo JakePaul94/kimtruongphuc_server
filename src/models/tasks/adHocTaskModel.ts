@@ -5,6 +5,7 @@ import {
   Sequelize,
   ModelStatic,
 } from "sequelize";
+import { TaskStatusType } from "../../types/taskStatusType";
 
 // 1. Attributes
 export interface AdHocTaskAttributes {
@@ -16,7 +17,7 @@ export interface AdHocTaskAttributes {
   title: string;
   description?: string | null;
   scheduledDate: Date;
-  status: "pending" | "in_progress" | "done";
+  status: TaskStatusType;
 }
 
 // 2. CreationAttributes
@@ -73,7 +74,7 @@ const AdHocTaskModel = (sequelize: Sequelize) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("pending", "in_progress", "done"),
+        type: DataTypes.ENUM('pending', 'in_process', 'completed', 'canceled'),
         allowNull: false,
         defaultValue: "pending",
       },
@@ -102,7 +103,7 @@ const AdHocTaskModel = (sequelize: Sequelize) => {
 
     AdHocTask.belongsTo(models.User, {
       foreignKey: "assignedTo",
-      as: "assignedUser",
+      as: "assignedToUser", // đổi alias khác
     });
 
     AdHocTask.belongsTo(models.User, {

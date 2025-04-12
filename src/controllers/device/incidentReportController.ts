@@ -22,7 +22,21 @@ const incidentReportController = {
 
   create: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const report = await incidentReportService.createReport(req.body);
+      const { deviceId, reportedBy, description } = req.body;
+  
+      // Xử lý ảnh (nhiều ảnh)
+      const photoFiles = req.files as Express.Multer.File[]; // nếu bạn dùng upload.array()
+      const photoUrls = photoFiles?.map((file) => {
+        return `${req.protocol}://${req.get("host")}/uploads/incidents/${file.filename}`;
+      });
+  
+      const report = await incidentReportService.createReport({
+        deviceId: Number(deviceId),
+        reportedBy: Number(reportedBy),
+        description,
+        photos: photoUrls,
+      });
+  
       res.status(201).json(report);
     } catch (err) {
       next(err);

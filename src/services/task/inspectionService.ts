@@ -1,4 +1,5 @@
 import { models } from "../../config/database";
+import { TaskStatusType } from "../../types/taskStatusType";
 
 import { ApiError } from "../../utils/ApiError";
 
@@ -98,7 +99,7 @@ const inspectionService = {
     return task;
   },
 
-  updateTaskStatus: async (taskId: number, status: string) => {
+  updateTaskStatus: async (taskId: number, status:TaskStatusType ) => {
     const task = await InspectionTask.findByPk(taskId);
     if (!task) throw new ApiError(404, "Inspection task not found");
 

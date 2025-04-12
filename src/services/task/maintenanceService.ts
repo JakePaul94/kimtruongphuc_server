@@ -1,4 +1,5 @@
 import { models } from "../../config/database";
+import { TaskStatusType } from "../../types/taskStatusType";
 import { ApiError } from "../../utils/ApiError";
 
 const {
@@ -8,7 +9,7 @@ const {
   MaintenanceTaskItem,
   Device,
 } = models;
-type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled"
+type TaskStatus = TaskStatusType
 const maintenanceService = {
   // 📌 TEMPLATE CRUD
 

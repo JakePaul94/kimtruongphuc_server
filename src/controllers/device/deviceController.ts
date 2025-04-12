@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { deviceService } from "../../services/devices/deviceService";
 import { ApiError } from "../../utils/ApiError";
+import boilerService from "../../services/boilers/boilerService";
+import { AuthRequest } from "../../types/authType";
 
 export const deviceController = {
   createDevice: async (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +28,29 @@ export const deviceController = {
       next(err);
     }
   },
+  getDevicesByUserId: async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const user = req.user;
+    console.log("user:", user);
 
+    if (!user || typeof user.id !== "number") {
+      return next(
+        new ApiError(400, "Không tìm thấy user hoặc user ID không hợp lệ")
+      );
+    }
+
+    try {
+      const boilerId = await boilerService.getBoilerIdByUserId(user.id);
+      console.log("Boiler ID:", boilerId);
+      const devices = await boilerService.getBoilerDevices(boilerId);
+      res.json(devices);
+    } catch (error) {
+      next(error); // đã có middleware xử lý ApiError
+    }
+  },
   getDeviceById: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = parseInt(req.params.id);

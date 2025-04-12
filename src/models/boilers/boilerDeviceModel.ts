@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, Model, ModelStatic, Optional, Sequelize } from 'sequelize';
 
 export interface BoilerDeviceAttributes {
   id: number;
@@ -25,7 +25,10 @@ const BoilerDeviceModel = (sequelize: Sequelize) => {
     tableName: 'boiler_devices',
     timestamps: true,
   });
-  (BoilerDevice as any).associate = (models: any) => {
+  (BoilerDevice as any).associate = (models: {
+      Boiler: ModelStatic<Model>;
+      Device: ModelStatic<Model>;
+    }) => {
     BoilerDevice.belongsTo(models.Boiler, {
       foreignKey: "boilerId",
       as: "boiler",

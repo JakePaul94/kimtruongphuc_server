@@ -13,7 +13,6 @@ export interface CleaningTemplateInstance
     CleaningTemplateAttributes {
   createdAt?: Date;
   updatedAt?: Date;
-
   locations?: CleaningTemplateLocationAttributes[]; 
 }
 export interface CreateCleaningTemplateInput extends CleaningTemplateAttributes {

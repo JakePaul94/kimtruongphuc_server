@@ -36,7 +36,7 @@ import {
           type: DataTypes.INTEGER,
           autoIncrement: true,
           primaryKey: true,
-        },
+        }, 
         adHocTaskId: {
           type: DataTypes.INTEGER,
           allowNull: false,
@@ -71,7 +71,7 @@ import {
   
       AdHocTaskLog.belongsTo(models.User, {
         foreignKey: "createdBy",
-        as: "user",
+        as: "logCreator",
       });
     };
   

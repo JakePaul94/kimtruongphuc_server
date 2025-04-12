@@ -1,4 +1,5 @@
 import { DataTypes, Model, Sequelize, Optional, ModelStatic } from "sequelize";
+import { TaskStatusType } from "../../../types/taskStatusType";
 
 export interface MaintenanceTaskAttributes {
   id: number;
@@ -9,7 +10,7 @@ export interface MaintenanceTaskAttributes {
   scheduledDate: Date;
   completedAt?: Date | null;
   notes?: string | null;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
+  status: TaskStatusType;
 }
 
 export interface MaintenanceTaskCreationAttributes

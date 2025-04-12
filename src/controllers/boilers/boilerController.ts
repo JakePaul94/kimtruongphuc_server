@@ -14,6 +14,7 @@ export const boilerController = {
   getBoilerById: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = parseInt(req.params.id);
+      console.log("Boiler ID:", id); // Log the boiler ID
       const boiler = await boilerService.getBoilerById(id);
       res.json(boiler);
     } catch (err) {

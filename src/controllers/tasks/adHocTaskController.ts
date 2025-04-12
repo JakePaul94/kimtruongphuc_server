@@ -62,5 +62,32 @@ export const adHocTaskController = {
     } catch (err) {
       next(err);
     }
+  },async getTaskById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const taskId = parseInt(req.params.id, 10);
+      const task = await adHocTaskService.getTaskById(taskId);
+      res.json(task);
+    } catch (err) {
+      next(err);
+    }
+  },
+  async updateTaskInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const taskId = parseInt(req.params.id, 10);
+      const updated = await adHocTaskService.updateTaskInfo(taskId, req.body);
+      res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async getLogsByTaskId(req: Request, res: Response, next: NextFunction) {
+    try {
+      const taskId = parseInt(req.params.id, 10);
+      const logs = await adHocTaskService.getLogsByTaskId(taskId);
+      res.json(logs);
+    } catch (err) {
+      next(err);
+    }
   },
 };

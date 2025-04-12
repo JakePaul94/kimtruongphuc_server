@@ -32,25 +32,42 @@ const BoilerModel = (sequelize: Sequelize) => {
     MaintenanceTask: ModelStatic<Model>;
     InspectionTask: ModelStatic<Model>;
     AdHocTask: ModelStatic<Model>;
+    WaterReportTask: ModelStatic<Model>;
+    CleaningTemplate: ModelStatic<Model>;
+    WaterReportTemplate: ModelStatic<Model>;
   }) => {
     Boiler.hasMany(models.BoilerUser, {
       foreignKey: "boilerId",
       as: "users",
       onDelete: "CASCADE",
     });
-  
+
     Boiler.hasMany(models.BoilerDevice, {
       foreignKey: "boilerId",
       as: "devices",
       onDelete: "CASCADE",
     });
-  
+
     Boiler.hasMany(models.CleaningTask, {
       foreignKey: "boilerId",
       as: "cleaningTasks",
       onDelete: "CASCADE",
     });
-  
+    Boiler.hasMany(models.CleaningTemplate, {
+      foreignKey: "boilerId",
+      as: "cleaningTemplates",
+      onDelete: "CASCADE",
+    });
+    Boiler.hasMany(models.WaterReportTask, {
+      foreignKey: "boilerId",
+      as: "WaterReportTasks",
+      onDelete: "CASCADE",
+    });
+    Boiler.hasMany(models.WaterReportTemplate, {
+      foreignKey: "boilerId",
+      as: "WaterReportTemplates",
+      onDelete: "CASCADE",
+    });
     Boiler.hasMany(models.AdHocTask, {
       foreignKey: "boilerId",
       as: "adHocTasks",

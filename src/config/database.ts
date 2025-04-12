@@ -9,7 +9,6 @@ import LoginHistoryModel from "../models/loginHistoryModel";
 import DeviceModel from "../models/devices/devicesModel";
 import DeviceDocumentModel from "../models/devices/deviceDocumentModel";
 
-
 // Boilers
 import BoilerModel from "../models/boilers/boilerModel";
 import BoilerUserModel from "../models/boilers/boilerUserModel";
@@ -22,15 +21,19 @@ import CleaningTaskModel from "../models/tasks/cleaning/cleaningTaskModel";
 import CleaningTaskLocationModel from "../models/tasks/cleaning/cleaningTaskLocationModel";
 
 import InspectionTemplateModel from "../models/tasks/inspection/inspectionTemplatesModel";
-import InspectionTemplateItemModel from "../models/tasks/inspection/inspectionTemplateItemModel"
+import InspectionTemplateItemModel from "../models/tasks/inspection/inspectionTemplateItemModel";
 import InspectionTaskModel from "../models/tasks/inspection/inspectionTaskModel";
 import InspectionTaskItemModel from "../models/tasks/inspection/inspectionTaskItemModel";
-
 
 import MaintenanceTemplateModel from "../models/tasks/maintenance/maintenanceTemplateModel";
 import MaintenanceTemplateItemModel from "../models/tasks/maintenance/maintenanceTemplateItemModel";
 import MaintenanceTaskModel from "../models/tasks/maintenance/maintenanceTaskModel";
 import MaintenanceTaskItemModel from "../models/tasks/maintenance/maintenanceTaskItemModel";
+
+import WaterReportTemplateModel from "../models/tasks/waterReport/waterReportTemplateModel";
+import WaterReportTemplateItemModel from "../models/tasks/waterReport/waterReportTemplateItemModel";
+import WaterReportTaskModel from "../models/tasks/waterReport/waterReportTaskModel";
+import WaterReportTaskItemModel from "../models/tasks/waterReport/waterReportTaskItemModel";
 
 import AdHocTaskModel from "../models/tasks/adHocTaskModel";
 import AdHocTaskLogModel from "../models/tasks/adHocTaskLogsModel";
@@ -68,7 +71,6 @@ const models = {
   BoilerUser: BoilerUserModel(sequelize),
   BoilerDevice: BoilerDeviceModel(sequelize),
 
-
   // Cleaning Tasks
   CleaningTemplate: CleaningTemplateModel(sequelize),
   CleaningTemplateLocation: CleaningTemplateLocationModel(sequelize),
@@ -81,11 +83,15 @@ const models = {
   MaintenanceTask: MaintenanceTaskModel(sequelize),
   MaintenanceTaskItem: MaintenanceTaskItemModel(sequelize),
 
- // Inspection Tasks ✅ (Đã thêm ở đây)
- InspectionTemplate: InspectionTemplateModel(sequelize),
- InspectionTemplateItem: InspectionTemplateItemModel(sequelize),
- InspectionTask: InspectionTaskModel(sequelize),
- InspectionTaskItem: InspectionTaskItemModel(sequelize),
+  WaterReportTemplate: WaterReportTemplateModel(sequelize),
+  WaterReportTemplateItem: WaterReportTemplateItemModel(sequelize),
+  WaterReportTask: WaterReportTaskModel(sequelize),
+  WaterReportTaskItem: WaterReportTaskItemModel(sequelize),
+  // Inspection Tasks ✅ (Đã thêm ở đây)
+  InspectionTemplate: InspectionTemplateModel(sequelize),
+  InspectionTemplateItem: InspectionTemplateItemModel(sequelize),
+  InspectionTask: InspectionTaskModel(sequelize),
+  InspectionTaskItem: InspectionTaskItemModel(sequelize),
 
   // Ad-Hoc Tasks
   AdHocTask: AdHocTaskModel(sequelize),

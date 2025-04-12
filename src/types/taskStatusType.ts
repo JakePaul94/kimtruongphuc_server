@@ -1,0 +1,1 @@
+export type TaskStatusType = 'pending' | 'in_process' | 'completed' | 'canceled';

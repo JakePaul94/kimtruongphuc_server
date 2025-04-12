@@ -14,6 +14,8 @@ import adHocTaskRouter from "./routes/tasks/adHocTaskRouter";
 import cleaningRouter from "./routes/tasks/cleaningRouter";
 import incidentRouter from "./routes/incidentReport.routes";
 import path from "path";
+import taskRouter from "./routes/tasks/taskRouter";
+import waterReportRouter from "./routes/tasks/waterReportRouer";
 
 dotenv.config();
 
@@ -37,7 +39,9 @@ app.use("/maintenance-tasks", maintenanceRouter);
 app.use("/inspection-tasks", inspectionRouter);
 app.use("/ad-hoc-tasks", adHocTaskRouter);
 app.use("/cleaning-tasks", cleaningRouter);
+app.use("/water-report-tasks", waterReportRouter);
 app.use("/incident-reports", incidentRouter); 
+app.use("/tasks", taskRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World with Express, TypeScript, Sequelize!");

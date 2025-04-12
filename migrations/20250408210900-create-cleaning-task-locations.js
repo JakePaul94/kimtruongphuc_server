@@ -29,7 +29,7 @@ module.exports = {
       },
       photoUrl: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       notes: {
         type: Sequelize.TEXT,
@@ -39,8 +39,16 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      createdAt: Sequelize.DATE,
-      updatedAt: Sequelize.DATE,
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
     });
   },
 

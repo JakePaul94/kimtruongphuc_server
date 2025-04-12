@@ -72,7 +72,7 @@ const UserModel = (sequelize: Sequelize) => {
           "boiler_worker"
         ),
         allowNull: false,
-        defaultValue: "office_staff",
+        defaultValue: "boiler_worker",
       },
       permissions: { type: DataTypes.TEXT, allowNull: true },
       department: { type: DataTypes.STRING, allowNull: true },
@@ -110,6 +110,9 @@ const UserModel = (sequelize: Sequelize) => {
     IncidentReport: ModelStatic<Model>;
     CleaningTemplate: ModelStatic<Model>;
     CleaningTaskLocation: ModelStatic<Model>;
+    WaterReportTemplate: ModelStatic<Model>;
+    WaterReportTask: ModelStatic<Model>;
+    WaterReportTaskItem: ModelStatic<Model>;
     MaintenanceTaskItem: ModelStatic<Model>;
     IncidentReportPhoto: ModelStatic<Model>;
     BoilerUser: ModelStatic<Model>;
@@ -139,20 +142,34 @@ const UserModel = (sequelize: Sequelize) => {
       foreignKey: "createdBy",
       as: "createdAdHocTasks",
     });
-
+    User.hasMany(models.AdHocTask, {
+      foreignKey: "assignedTo",
+      as: "assignedAdHocTasks",
+    });
+    User.hasMany(models.AdHocTaskLog, {
+      foreignKey: "createdBy",
+      as: "adHocTaskLogs",
+    });
     User.hasMany(models.InspectionTask, {
       foreignKey: "createdBy",
       as: "createdInspectionTasks",
     });
-
+    User.hasMany(models.WaterReportTask, {
+      foreignKey: "createdBy",
+      as: "reatedWaterReportTasks",
+    });
     User.hasMany(models.MaintenanceTask, {
       foreignKey: "createdBy",
       as: "createdMaintenanceTasks",
     });
 
     User.hasMany(models.CleaningTask, {
-      foreignKey: "assignedUserId",
+      foreignKey: "assignedTo",
       as: "assignedCleaningTasks",
+    });
+    User.hasMany(models.WaterReportTask, {
+      foreignKey: "assignedTo",
+      as: "assignedWaterReportTasks",
     });
 
     // Inspection Tasks
@@ -160,20 +177,10 @@ const UserModel = (sequelize: Sequelize) => {
       foreignKey: "assignedTo",
       as: "assignedInspectionTasks",
     });
-    // Ad Hoc Tasks - người được giao task
-    User.hasMany(models.AdHocTask, {
-      foreignKey: "assignedUserId",
-      as: "adHocTasks",
-    });
 
-    // Ad Hoc Task Logs - người ghi log
-    User.hasMany(models.AdHocTaskLog, {
-      foreignKey: "userId",
-      as: "adHocTaskLogs",
-    });
     // Incident Reports - người báo cáo
     User.hasMany(models.IncidentReport, {
-      foreignKey: "reporterId",
+      foreignKey: "reportedBy",
       as: "incidentReports",
     });
     User.hasMany(models.BoilerUser, {

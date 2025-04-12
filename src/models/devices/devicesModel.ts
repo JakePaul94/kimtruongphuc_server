@@ -5,7 +5,7 @@ export interface DeviceAttributes {
   deviceCode: string;
   deviceName: string;
   parentId?: number | null;
-  boilerId?: number | null; 
+  boilerId?: number | null;
   model?: string;
   brand?: string;
   origin?: string;
@@ -14,6 +14,7 @@ export interface DeviceAttributes {
   usageStatus?: string;
   installationDate?: Date;
   warrantyExpiration?: Date;
+  imageUrl: string;
   location?: string;
   value?: number;
   department?: string;
@@ -66,6 +67,10 @@ const DeviceModel = (sequelize: Sequelize) => {
       model: { type: DataTypes.STRING(100), allowNull: true },
       brand: { type: DataTypes.STRING(100), allowNull: true },
       origin: { type: DataTypes.STRING(100), allowNull: true },
+      imageUrl: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+      },
       yearOfManufacture: { type: DataTypes.INTEGER, allowNull: true },
       serialNumber: { type: DataTypes.STRING(100), allowNull: true },
       usageStatus: { type: DataTypes.STRING(100), allowNull: true },

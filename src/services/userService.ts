@@ -1,4 +1,4 @@
-import { models } from "../config/database";
+import { models} from "../config/database";
 import bcrypt from "bcrypt";
 import { ApiError } from "../utils/ApiError"; // Import ApiError
 const User = models.User;
@@ -50,10 +50,10 @@ const userService = {
       const users = await User.findAll({
         include: [
           {
-            model: BoilerUser,
+            model:  models.BoilerUser,
             as: 'boilerUsers',
             where: { boilerId },
-            attributes: [], // không lấy trường của BoilerUser
+            attributes: [], 
           },
         ],
       });
@@ -78,7 +78,7 @@ const userService = {
     } catch (error: any) {
       console.error("Error creating user:", error);
       if (error.name === "SequelizeUniqueConstraintError") {
-        throw new ApiError(400, "Username or email already exists.");
+        throw new ApiError(400, "PhoneNumber or email already exists.");
       }
       throw new ApiError(500, "Failed to create user.");
     }

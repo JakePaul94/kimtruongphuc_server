@@ -8,7 +8,14 @@ adHocTaskRouter.get("/boiler/:boilerId/tasks", adHocTaskController.getTasksByBoi
 
 // 📌 Lấy task theo userId và ngày: /user/:userId/tasks?date=YYYY-MM-DD
 adHocTaskRouter.get("/user/:userId/tasks", adHocTaskController.getTasksByUserAndDate);
+// 📌 Lấy chi tiết một task theo ID
+adHocTaskRouter.get("/:id", adHocTaskController.getTaskById);
 
+// 📌 Cập nhật thông tin task
+adHocTaskRouter.put("/:id", adHocTaskController.updateTaskInfo);
+
+// 📌 Lấy toàn bộ log của một task
+adHocTaskRouter.get("/:id/logs", adHocTaskController.getLogsByTaskId);
 // 📌 Tạo task
 adHocTaskRouter.post("/", adHocTaskController.createTask);
 

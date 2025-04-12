@@ -6,7 +6,7 @@ const boilerRouter = express.Router();
 // CRUD
 boilerRouter.get("/", boilerController.getAllBoilers);
 boilerRouter.get("/:id", boilerController.getBoilerById);
-boilerRouter.post("/", boilerController.createBoiler);
+boilerRouter.post("/create", boilerController.createBoiler);
 boilerRouter.put("/:id", boilerController.updateBoiler);
 boilerRouter.delete("/:id", boilerController.deleteBoiler);
 
