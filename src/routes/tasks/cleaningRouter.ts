@@ -43,6 +43,7 @@ cleaningRouter.get(
   isAuthenticated, // Middleware xác thực
   cleaningController.getAvailableTasksForMyBoilers // Controller function mới
 );
+cleaningRouter.get("/tasks/:id", isAuthenticated, cleaningController.getCleaningTaskById); // Thêm auth nếu cần
 cleaningRouter.get(
   "/tasks/assigned/me",
   isAuthenticated,

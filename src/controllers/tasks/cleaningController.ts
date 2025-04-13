@@ -152,24 +152,53 @@ export const cleaningController = {
     try {
       const taskId = parseInt(req.params.id);
       if (isNaN(taskId)) throw new ApiError(400, "Invalid task ID.");
-  
+
       const { status: statusFromBody } = req.body;
       if (!statusFromBody || typeof statusFromBody !== "string") {
         throw new ApiError(400, "Missing or invalid status in request body.");
       }
-  
+
       // Kiểm tra xem statusFromBody có phải là một giá trị hợp lệ trong TaskStatusType hay không
-      const allowedStatuses: TaskStatusType[] = ['pending', 'in_process', 'completed', 'canceled'];
+      const allowedStatuses: TaskStatusType[] = [
+        "pending",
+        "in_process",
+        "completed",
+        "canceled",
+      ];
       if (!allowedStatuses.includes(statusFromBody as TaskStatusType)) {
-        throw new ApiError(400, `Invalid status value: ${statusFromBody}. Allowed values are: ${allowedStatuses.join(', ')}`);
+        throw new ApiError(
+          400,
+          `Invalid status value: ${statusFromBody}. Allowed values are: ${allowedStatuses.join(
+            ", "
+          )}`
+        );
       }
-  
+
       // Ép kiểu statusFromBody thành TaskStatusType (sau khi đã validation)
-      const updated = await cleaningService.updateTaskStatus(taskId, statusFromBody as TaskStatusType);
+      const updated = await cleaningService.updateTaskStatus(
+        taskId,
+        statusFromBody as TaskStatusType
+      );
       res.json(updated);
-  
     } catch (err) {
       next(err);
+    }
+  },
+  getCleaningTaskById: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) {
+        throw new ApiError(400, "Invalid task ID");
+      }
+
+      const task = await cleaningService.getCleaningTaskById(id);
+      res.json(task);
+    } catch (error) {
+      next(error);
     }
   },
   acceptTask: async (req: AuthRequest, res: Response, next: NextFunction) => {

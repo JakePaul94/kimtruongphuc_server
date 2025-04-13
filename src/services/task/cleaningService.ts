@@ -31,17 +31,12 @@ interface LocationInput {
   // Thêm các trường khác bạn muốn cho phép client gửi khi tạo location ở đây
 }
 
-// Sử dụng LocationInput trong CreateCleaningTemplateInputUpdated
+
 interface CreateCleaningTemplateInputUpdated
   extends Omit<CleaningTemplateAttributes, "id"> {
   locations?: LocationInput[]; // Sử dụng interface đã sửa
 }
 
-// Cập nhật Input interface nếu cần (đảm bảo locations chứa qrCodeIdentifier)
-interface CreateCleaningTemplateInputUpdated
-  extends Omit<CleaningTemplateAttributes, "id"> {
-  locations?: LocationInput[]; // Đảm bảo locations có kiểu phù hợp
-}
 
 const cleaningService = {
   // 📌 TEMPLATE CRUD
@@ -191,6 +186,56 @@ const cleaningService = {
   },
 
   // 📌 TASK CRUD
+  getCleaningTaskById: async (id: number): Promise<CleaningTaskInstance> => {
+    const task = await CleaningTask.findByPk(id, {
+      include: [
+        {
+          model: CleaningTaskLocation,
+          as: "locations",
+          attributes: { exclude: ["updatedAt"] },
+          include: [
+            {
+              model: CleaningTemplateLocation,
+              as: "templateLocation",
+              attributes: [
+                "id",
+                "name",
+                "qrCodeIdentifier",
+                "instructions",
+                "exampleImageUrl",
+              ],
+            },
+          ],
+        },
+        {
+          model: models.User,
+          as: "creator",
+          attributes: ["id", "fullName", "email"],
+        },
+        {
+          model: models.User,
+          as: "assignedUser",
+          attributes: ["id", "fullName", "email"],
+        },
+        {
+          model: models.Boiler,
+          as: "boiler",
+          attributes: ["id", "name", "location"],
+        },
+        {
+          model: models.CleaningTemplate,
+          as: "template",
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+  
+    if (!task) {
+      throw new ApiError(404, "Cleaning task not found");
+    }
+  
+    return task;
+  },
   getAssignedTasksByDate: async (
     userId: number,
     date: string
