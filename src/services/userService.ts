@@ -4,17 +4,10 @@ import { ApiError } from "../utils/ApiError"; // Import ApiError
 const User = models.User;
 
 const userService = {
-  getAllUsersWithManagers: async () => {
+  getAllUsers: async () => {
     try {
       const users = await User.findAll({
-        attributes: ["id", "fullName", "email", "phoneNumber"], 
-        include: [
-          {
-            model: User,
-            as: "Manager",
-            attributes: ["id", "fullName", "email", "phoneNumber"], 
-          },
-        ],
+        attributes: ["id", "fullName", "email", "phoneNumber", "role","profilePicture"],
       });
       const plainUsers = users.map((user) => user.get({ plain: true }));
       console.log(plainUsers);
@@ -25,17 +18,9 @@ const userService = {
     }
   },
 
-  getUserByIdWithManager: async (id: number) => {
+  getUserById: async (id: number) => {
     try {
-      const user = await User.findByPk(id, {
-        include: [
-          {
-            model: User,
-            as: "Manager",
-            attributes: ["id", "fullName", "email"],
-          },
-        ],
-      });
+      const user = await User.findByPk(id);
       if (!user) {
         throw new ApiError(404, `User with ID ${id} not found.`);
       }

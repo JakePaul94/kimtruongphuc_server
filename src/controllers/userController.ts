@@ -10,7 +10,7 @@ const userController = {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const users = await userService.getAllUsersWithManagers();
+      const users = await userService.getAllUsers();
       res.json(users);
     } catch (error: any) {
       next(error);
@@ -24,7 +24,7 @@ const userController = {
   ): Promise<void> => {
     const userId = parseInt(req.params.id, 10);
     try {
-      const user = await userService.getUserByIdWithManager(userId);
+      const user = await userService.getUserById(userId);
       if (user) {
         res.json(user);
       } else {
