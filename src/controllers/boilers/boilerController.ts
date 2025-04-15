@@ -95,8 +95,9 @@ export const boilerController = {
   },
   createDeviceToBoiler: async (req: Request, res: Response, next: NextFunction) => {
     try { 
-      const { boilerId, deviceData } = req.body;
-      const result = await boilerService.createDeviceToBoiler(boilerId, deviceData);
+      const { boilerId } = req.params;
+      const  deviceData  = req.body;
+      const result = await boilerService.createDeviceToBoiler(parseInt(boilerId), deviceData);
       res.status(201).json(result);
     } catch (err) {
       next(err);
