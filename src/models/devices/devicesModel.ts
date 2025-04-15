@@ -5,7 +5,6 @@ export interface DeviceAttributes {
   deviceCode: string;
   deviceName: string;
   parentId?: number | null;
-  boilerId?: number | null;
   model?: string;
   brand?: string;
   origin?: string;
@@ -58,12 +57,6 @@ const DeviceModel = (sequelize: Sequelize) => {
         references: { model: "devices", key: "id" },
         onDelete: "SET NULL",
       },
-      boilerId: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: { model: "boilers", key: "id" },
-        onDelete: "SET NULL",
-      },
       model: { type: DataTypes.STRING(100), allowNull: true },
       brand: { type: DataTypes.STRING(100), allowNull: true },
       origin: { type: DataTypes.STRING(100), allowNull: true },
@@ -103,10 +96,6 @@ const DeviceModel = (sequelize: Sequelize) => {
   );
 
   (Device as any).associate = (models: any) => {
-    Device.belongsTo(models.Boiler, {
-      foreignKey: "boilerId",
-      as: "boiler",
-    });
 
     Device.hasMany(models.Device, {
       foreignKey: "parentId",
