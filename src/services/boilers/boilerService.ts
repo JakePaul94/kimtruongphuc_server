@@ -103,7 +103,9 @@ const boilerService = {
     try {
       return await BoilerUser.findAll({
         where: { boilerId },
-        include: [{ model: User, as: "user" }],
+        include: [{ model: User, as: "user" }], attributes: {
+          exclude: ['password'] 
+        }
       });
     } catch (error: any) {
       console.error("Error fetching boiler users:", error);
