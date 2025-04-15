@@ -13,11 +13,12 @@ boilerRouter.delete("/:id", boilerController.deleteBoiler);
 // Quản lý user-boiler
 boilerRouter.post("/assign-user", boilerController.assignUserToBoiler);
 boilerRouter.delete('/:boilerId/users/:userId', boilerController.removeUserFromBoiler);
-boilerRouter.get("/:id/users", boilerController.getBoilerUsers);
+boilerRouter.get("/:boilerId/users", boilerController.getBoilerUsers);
 
 // Quản lý device-boiler
 boilerRouter.post("/assign-device", boilerController.assignDeviceToBoiler);
+boilerRouter.post("/:boilerId/devices", boilerController.createDeviceToBoiler);
 boilerRouter.delete('/:boilerId/devices/:deviceId', boilerController.removeDeviceFromBoiler);
-boilerRouter.get("/:id/devices", boilerController.getBoilerDevices);
+boilerRouter.get("/:boilerId/devices", boilerController.getBoilerDevices);
 
 export default boilerRouter;

@@ -1,4 +1,5 @@
 import { models } from "../../config/database";
+import { DeviceAttributes, DeviceInstance } from "../../models/devices/devicesModel";
 import { ApiError } from "../../utils/ApiError";
 
 const Boiler = models.Boiler;
@@ -104,7 +105,7 @@ const boilerService = {
       return await BoilerUser.findAll({
         where: { boilerId },
         include: [{ model: User, as: "user" }], attributes: {
-          exclude: ['password'] 
+          exclude: ['password']
         }
       });
     } catch (error: any) {
@@ -121,7 +122,42 @@ const boilerService = {
       throw new ApiError(500, "Failed to assign device to boiler.");
     }
   },
+  createDeviceToBoiler: async (
+    boilerId: number,
+    deviceData: Omit<DeviceAttributes, "id" | "createdAt" | "updatedAt">
+  ): Promise<DeviceAttributes> => {
+    try {
+      if (await Device.findOne({ where: { deviceCode: deviceData.deviceCode } })) {
+        throw new ApiError(401, "Mã thiết bị đã tồn tại");
+      }
+  
+      if (deviceData.parentId) {
+        const parentDevice = await Device.findByPk(deviceData.parentId);
+        if (!parentDevice) {
+          throw new ApiError(
+            401,
+            `Thiết bị cha với ID ${deviceData.parentId} không tồn tại.`
+          );
+        }
+      }
 
+      const newDevice = await Device.create(deviceData);
+  
+      const deviceId = newDevice.id;
+      if (!deviceId) {
+        throw new ApiError(500, "Không thể lấy ID thiết bị mới.");
+      }
+      await BoilerDevice.create({ boilerId, deviceId });
+  
+      return newDevice;
+    } catch (error: any) {
+      console.error("Error creating device and assigning to boiler:", error);
+      if (error instanceof ApiError) {
+        throw error; // Nếu là lỗi ApiError đã được định nghĩa, ném lại
+      }
+      throw new ApiError(500, "Không thể tạo thiết bị và gán cho lò hơi."); // Lỗi chung khi tạo
+    }
+  },
   removeDeviceFromBoiler: async (boilerId: number, deviceId: number) => {
     try {
       const deleted = await BoilerDevice.destroy({

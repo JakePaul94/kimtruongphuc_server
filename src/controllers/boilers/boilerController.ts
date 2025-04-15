@@ -93,7 +93,15 @@ export const boilerController = {
       next(err);
     }
   },
-
+  createDeviceToBoiler: async (req: Request, res: Response, next: NextFunction) => {
+    try { 
+      const { boilerId, deviceData } = req.body;
+      const result = await boilerService.createDeviceToBoiler(boilerId, deviceData);
+      res.status(201).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
   removeDeviceFromBoiler: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { boilerId, devoceId } = req.params;
