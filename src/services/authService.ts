@@ -89,7 +89,130 @@ const authService = {
       throw error;
     }
   },
+ // Tự động đăng nhập bằng refresh token (NEW FUNCTION)
+ autoLogin: async (
+  refreshToken: string,
+  ipAddress: string,
+  userAgent: string,
+  loginTimestamp: Date
+) => {
+  try {
+    // 1. Tìm và xác thực refresh token
+    const storedToken = await RefreshToken.findOne({ where: { token: refreshToken } });
 
+    if (!storedToken) {
+      // Không tìm thấy token => không hợp lệ hoặc đã bị xoá/hết hạn
+      // Ghi log thất bại nếu cần thiết (không có userId ở đây)
+      await LoginHistory.create({
+          userId: null, // Không xác định được user
+          ipAddress,
+          userAgent,
+          loginTimestamp,
+          status: "failed",
+          reason: "Auto-login failed: Invalid or non-existent refresh token",
+        });
+      throw new ApiError(401, "Invalid or expired refresh token");
+    }
+
+    // 2. Kiểm tra token hết hạn
+    if (storedToken.expiresAt && storedToken.expiresAt < new Date()) {
+      const userId = storedToken.userId; // Lấy userId trước khi xóa
+      await storedToken.destroy(); // Xóa token hết hạn khỏi DB
+       await LoginHistory.create({
+          userId: userId, // Ghi log với userId nếu có thể
+          ipAddress,
+          userAgent,
+          loginTimestamp,
+          status: "failed",
+          reason: "Auto-login failed: Refresh token expired",
+        });
+      throw new ApiError(401, "Refresh token expired");
+    }
+
+    // 3. Lấy thông tin user từ userId trong token
+    const user = await User.findByPk(storedToken.userId);
+    if (!user) {
+      // User không tồn tại (có thể đã bị xóa) => token không còn hợp lệ
+      const userId = storedToken.userId;
+      await storedToken.destroy(); // Xóa token mồ côi
+      await LoginHistory.create({
+          userId: userId,
+          ipAddress,
+          userAgent,
+          loginTimestamp,
+          status: "failed",
+          reason: "Auto-login failed: User not found",
+        });
+      throw new ApiError(404, "User associated with token not found");
+    }
+
+    // --- Nếu mọi thứ hợp lệ ---
+
+    // 4. Tạo payload cho access token mới
+    const payload = {
+      user: {
+        id: user.id,
+        role: user.role,
+      },
+    };
+
+    // 5. Tạo access token mới
+    const newAccessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+    // 6. Tạo refresh token mới (Refresh Token Rotation)
+    const newRefreshToken = uuidv4();
+
+    // 7. Xóa refresh token cũ và lưu refresh token mới vào DB
+    await storedToken.destroy(); // Quan trọng: Vô hiệu hóa token đã sử dụng
+    await RefreshToken.create({
+      token: newRefreshToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN * 1000),
+    });
+
+    // 8. Ghi log lịch sử đăng nhập thành công
+    await LoginHistory.create({
+      userId: user.id,
+      ipAddress,
+      userAgent,
+      loginTimestamp,
+      status: "success",
+      reason: "Auto-login via refresh token" // Ghi rõ phương thức
+    });
+
+    // 9. Chuẩn bị dữ liệu trả về (loại bỏ password)
+    const userWithoutPassword = sanitizeUser(user);
+
+    // 10. Trả về cấu trúc tương tự hàm login
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken, // Trả về token mới
+      user: userWithoutPassword,
+    };
+
+  } catch (error) {
+    // Ghi log lỗi nếu cần thiết
+    console.error("AutoLogin Error:", error);
+     // Đảm bảo ném lỗi ApiError hoặc lỗi chuẩn
+     if (error instanceof ApiError) {
+         throw error;
+     }
+     // Ghi log thất bại tổng quát nếu chưa được xử lý ở trên
+     try {
+       await LoginHistory.create({
+         userId: null, // Không chắc chắn có userId ở giai đoạn này
+         ipAddress,
+         userAgent,
+         loginTimestamp,
+         status: "failed",
+         reason: `Auto-login failed: Internal error - ${error instanceof Error ? error.message : String(error)}`,
+       });
+     } catch (logError) {
+       console.error("Failed to log autoLogin failure:", logError);
+     }
+     throw new ApiError(500, "Auto-login failed due to an internal error");
+  }
+},
   // Đăng xuất - Xoá refresh token khỏi DB
   logout: async (refreshToken: string) => {
     try {

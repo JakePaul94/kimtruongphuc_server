@@ -21,7 +21,31 @@ const authController = {
 
     res.json(result);
   },
+  autoLogin: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { ipAddress,userAgent,refreshToken,loginTimestamp } = req.body;
 
+      // 1. Validate input
+      if (!refreshToken) {
+        throw new ApiError(400, "Refresh token is required.");
+      }
+
+      const result = await authService.autoLogin(
+        refreshToken,
+        ipAddress,
+        userAgent,
+        loginTimestamp
+      );
+
+      // 4. Send successful response (service handles errors by throwing)
+      // Kết quả trả về có cấu trúc giống như login
+      res.json(result);
+
+    } catch (error) {
+      // 5. Pass errors to the global error handler middleware
+      next(error);
+    }
+  },
   logout: async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { refreshToken } = req.body;
 

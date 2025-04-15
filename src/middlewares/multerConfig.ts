@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 export const getMulterUploader = (folderName: string) => {
-  const fullPath = path.join(__dirname, '..', 'uploads', folderName);
+  const fullPath = path.join(__dirname, '..', '..', 'uploads', folderName);
 
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });

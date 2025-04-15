@@ -7,7 +7,7 @@ const deviceRouter = express.Router();
 deviceRouter.post("/create", deviceController.createDevice);
 deviceRouter.get("/", deviceController.getAllDevices);
 deviceRouter.get("/device/:id", deviceController.getDeviceById);
-deviceRouter.put("/device/:id", deviceController.updateDevice);
+deviceRouter.put("/update/:id", deviceController.updateDevice);
 deviceRouter.delete("/device/:id", deviceController.deleteDevice);
 deviceRouter.get("/:id/sub-devices", deviceController.getSubDevices);
 deviceRouter.get("/:id/maintenance-tasks", deviceController.getDeviceMaintenanceTasks);

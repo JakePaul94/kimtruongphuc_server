@@ -16,6 +16,7 @@ import incidentRouter from "./routes/incidentReport.routes";
 import path from "path";
 import taskRouter from "./routes/tasks/taskRouter";
 import waterReportRouter from "./routes/tasks/waterReportRouer";
+import uploadRouter from "./routes/uploadRouter";
 
 dotenv.config();
 
@@ -28,8 +29,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use("/static", express.static(path.join(__dirname,"..", "uploads")));
+app.use('/api/uploads', uploadRouter);
 
 app.use("/users", userRoutes);
 app.use("/auth", authRouter);
@@ -47,7 +48,7 @@ app.get("/", (req, res) => {
   res.send("Hello World with Express, TypeScript, Sequelize!");
 });
 app.use(errorMiddleware);
-
+const host ="0.0.0.0"
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

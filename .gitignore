@@ -26,3 +26,5 @@ logs/
 
 # VS Code settings
 .vscode/
+# static file directories
+uploads/
