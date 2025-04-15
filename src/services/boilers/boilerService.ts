@@ -153,7 +153,7 @@ const boilerService = {
     } catch (error: any) {
       console.error("Error creating device and assigning to boiler:", error);
       if (error instanceof ApiError) {
-        throw error; // Nếu là lỗi ApiError đã được định nghĩa, ném lại
+        throw error; 
       }
       throw new ApiError(500, "Không thể tạo thiết bị và gán cho lò hơi."); // Lỗi chung khi tạo
     }

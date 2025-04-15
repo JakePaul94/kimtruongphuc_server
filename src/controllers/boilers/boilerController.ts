@@ -76,7 +76,7 @@ export const boilerController = {
 
   getBoilerUsers: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const boilerId = parseInt(req.params.id);
+      const boilerId = parseInt(req.params.boilerId);
       const users = await boilerService.getBoilerUsers(boilerId);
       res.status(200).json(users);
     } catch (err) {
@@ -95,8 +95,8 @@ export const boilerController = {
   },
   createDeviceToBoiler: async (req: Request, res: Response, next: NextFunction) => {
     try { 
-      const {boilerId} = req.params;
-      const deviceData  = req.body;
+      const { boilerId } = req.params;
+      const  deviceData  = req.body;
       const result = await boilerService.createDeviceToBoiler(parseInt(boilerId), deviceData);
       res.status(201).json(result);
     } catch (err) {
@@ -118,7 +118,7 @@ export const boilerController = {
 
   getBoilerDevices: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const boilerId = parseInt(req.params.id);
+      const boilerId = parseInt(req.params.boilerId);
       const devices = await boilerService.getBoilerDevices(boilerId);
       res.json(devices);
     } catch (err) {
