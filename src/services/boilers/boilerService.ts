@@ -99,7 +99,22 @@ const boilerService = {
       throw new ApiError(500, "Failed to remove user from boiler.");
     }
   },
-
+  getAllBoilerUsers:  async () => {
+    try {
+      return await BoilerUser.findAll();
+    } catch (error: any) {
+      console.error("Error fetching boiler users:", error);
+      throw new ApiError(500, "Failed to fetch boiler users.");
+    }
+  },
+  getAllBoilerDevices:  async () => {
+    try {
+      return await BoilerDevice.findAll();
+    } catch (error: any) {
+      console.error("Error fetching boiler users:", error);
+      throw new ApiError(500, "Failed to fetch boiler users.");
+    }
+  },
   getBoilerUsers: async (boilerId: number) => {
     try {
       return await BoilerUser.findAll({

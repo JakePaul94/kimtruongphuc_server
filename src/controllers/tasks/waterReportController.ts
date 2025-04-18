@@ -34,6 +34,7 @@ export const waterReportController = {
     try {
       // TODO: Thêm validation chi tiết cho req.body (dùng Joi, Zod, hoặc check thủ công)
       // Ví dụ: kiểm tra name, boilerId, items (label) có tồn tại và đúng kiểu không.
+      console.log(req.body)
       if (!req.body.name || !req.body.boilerId) {
           throw new ApiError(400, "Missing required fields: name, boilerId.");
       }

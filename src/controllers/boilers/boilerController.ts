@@ -10,7 +10,21 @@ export const boilerController = {
       next(err);
     }
   },
-
+  getAllBoierUsers: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const boilerUsers = await boilerService.getAllBoilerUsers();
+      res.json(boilerUsers);
+    } catch (err) {
+      next(err);
+    }
+  }, getAllBoierDevices: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const boilerDevices = await boilerService.getAllBoilerDevices();
+      res.json(boilerDevices);
+    } catch (err) {
+      next(err);
+    }
+  },
   getBoilerById: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = parseInt(req.params.id);
@@ -65,9 +79,9 @@ export const boilerController = {
     try {
       const { boilerId, userId } = req.params;
 
-      
+
       await boilerService.removeUserFromBoiler(parseInt(boilerId, 10), parseInt(userId, 10));
-      res.status(204).send(); 
+      res.status(204).send();
     } catch (err: any) {
       console.error("Error removing user from boiler:", err);
       next(err); // Pass the error to the next middleware
@@ -94,9 +108,9 @@ export const boilerController = {
     }
   },
   createDeviceToBoiler: async (req: Request, res: Response, next: NextFunction) => {
-    try { 
+    try {
       const { boilerId } = req.params;
-      const  deviceData  = req.body;
+      const deviceData = req.body;
       const result = await boilerService.createDeviceToBoiler(parseInt(boilerId), deviceData);
       res.status(201).json(result);
     } catch (err) {
@@ -107,9 +121,9 @@ export const boilerController = {
     try {
       const { boilerId, devoceId } = req.params;
 
-      
+
       await boilerService.removeDeviceFromBoiler(parseInt(boilerId, 10), parseInt(devoceId, 10));
-      res.status(204).send(); 
+      res.status(204).send();
     } catch (err: any) {
       console.error("Error removing user from boiler:", err);
       next(err); // Pass the error to the next middleware

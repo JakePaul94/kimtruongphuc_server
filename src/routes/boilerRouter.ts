@@ -3,6 +3,9 @@ import { boilerController } from "../controllers/boilers/boilerController";
 
 const boilerRouter = express.Router();
 
+//Innitial
+boilerRouter.get("/users", boilerController.getAllBoierUsers);
+boilerRouter.get("/devices", boilerController.getAllBoierDevices);
 // CRUD
 boilerRouter.get("/", boilerController.getAllBoilers);
 boilerRouter.get("/:id", boilerController.getBoilerById);
@@ -20,5 +23,6 @@ boilerRouter.post("/assign-device", boilerController.assignDeviceToBoiler);
 boilerRouter.post("/:boilerId/devices", boilerController.createDeviceToBoiler);
 boilerRouter.delete('/:boilerId/devices/:deviceId', boilerController.removeDeviceFromBoiler);
 boilerRouter.get("/:boilerId/devices", boilerController.getBoilerDevices);
+
 
 export default boilerRouter;

@@ -10,7 +10,7 @@ export interface WaterReportTaskAttributes {
   templateId: number;
   boilerId: number;
   assignedTo?: number | null;
-  scheduledDate: Date;
+  scheduledDate: string;
   status:TaskStatusType; // Trạng thái của phiên bản báo cáo
   createdBy?: number | null;
   completedAt?: Date | null;
@@ -61,7 +61,7 @@ const WaterReportTaskModel = (sequelize: Sequelize) => {
         onUpdate: "CASCADE",
       },
       scheduledDate: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       status: {

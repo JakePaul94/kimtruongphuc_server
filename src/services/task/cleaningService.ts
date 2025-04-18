@@ -156,21 +156,70 @@ const cleaningService = {
   },
   // updateTemplate cần xem xét: việc cập nhật locations (thêm/sửa/xóa) và qrCodeIdentifier phức tạp hơn,
   // có thể cần logic riêng để xử lý thay vì chỉ template.update(data). Tạm thời giữ nguyên.
-  updateTemplate: async (id: number, data: any) => {
-    // TODO: Cần xử lý cập nhật locations phức tạp hơn nếu cho phép sửa đổi locations
-    // Ví dụ: Tìm locations cũ, locations mới, xóa cái cũ không có trong mới, thêm cái mới, cập nhật cái trùng...
-    // Đặc biệt cẩn thận khi cập nhật qrCodeIdentifier.
+  updateTemplate : async (id: number, data: any) => {
     const template = await CleaningTemplate.findByPk(id);
-    if (!template) throw new ApiError(404, "Cleaning template not found");
-
-    // Chỉ cập nhật các trường của chính Template (name, description)
-    const { locations, ...templateData } = data; // Loại bỏ locations khỏi data update trực tiếp
+    if (!template) {
+      throw new ApiError(404, 'Cleaning template not found');
+    }
+  
+    const { locations, ...templateData } = data;
+  
+    // Update the template's basic information
     await template.update(templateData);
-    // Logic xử lý locations riêng biệt (nếu cần) sẽ ở đây
-
+  
+    if (locations && Array.isArray(locations)) {
+      const existingLocations = await CleaningTemplateLocation.findAll({
+        where: { templateId: id },
+      });
+  
+      const updatedLocationIds = new Set<number>();
+      const existingQrCodes = new Set(existingLocations.map(loc => loc.qrCodeIdentifier));
+  
+      // Process each location in the provided array
+      for (const locationData of locations) {
+        const { id: locationId, qrCodeIdentifier, ...otherLocationData } = locationData;
+  
+        // Kiểm tra qrCodeIdentifier có bị trùng lặp trong request không
+        const isDuplicateQrCodeInRequest = locations.filter(loc => loc.qrCodeIdentifier === qrCodeIdentifier).length > 1;
+        if (isDuplicateQrCodeInRequest) {
+          throw new ApiError(400, `QR code '${qrCodeIdentifier}' is duplicated in the request.`);
+        }
+  
+        if (locationId) {
+          // Update existing location
+          const existingLocation = existingLocations.find((loc) => loc.id === locationId);
+          if (existingLocation) {
+            // Kiểm tra tính duy nhất của qrCodeIdentifier khi cập nhật
+            if (qrCodeIdentifier !== existingLocation.qrCodeIdentifier && existingQrCodes.has(qrCodeIdentifier)) {
+              throw new ApiError(400, `QR code '${qrCodeIdentifier}' already exists.`);
+            }
+            await existingLocation.update({ qrCodeIdentifier, ...otherLocationData });
+            updatedLocationIds.add(locationId);
+          } else {
+            console.warn(`Location with ID ${locationId} not found for template ${id}.`);
+          }
+        } else {
+          // Create a new location
+          if (existingQrCodes.has(qrCodeIdentifier)) {
+            throw new ApiError(400, `QR code '${qrCodeIdentifier}' already exists.`);
+          }
+          await CleaningTemplateLocation.create({ templateId: id, qrCodeIdentifier, ...otherLocationData });
+        }
+        existingQrCodes.add(qrCodeIdentifier); // Thêm QR code mới vào set để kiểm tra các lần sau trong request
+      }
+  
+      // Remove locations that are not in the updated list
+      const locationsToRemove = existingLocations.filter(
+        (loc) => !updatedLocationIds.has(loc.id)
+      );
+  
+      for (const locationToRemove of locationsToRemove) {
+        await locationToRemove.destroy();
+      }
+    }
+  
     return await template.reload({
-      // Tải lại để lấy dữ liệu mới nhất (bao gồm locations nếu có thay đổi)
-      include: [{ model: CleaningTemplateLocation, as: "locations" }],
+      include: [{ model: CleaningTemplateLocation, as: 'locations' }],
     });
   },
 
@@ -442,7 +491,7 @@ const cleaningService = {
   // --- SỬA ĐỔI createTask ---
   createTask: async (data: any) => {
     const { boilerId, createdBy, templateId, scheduledDate, assignedTo } = data;
-
+    
     if (!templateId) {
       throw new ApiError(
         400,

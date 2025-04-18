@@ -7,7 +7,6 @@ import waterReportService from "../../services/task/waterReportService";
 import { ApiError } from "../../utils/ApiError"; // Import ApiError nếu chưa có
 import { AuthRequest } from "../../types/authType";
 import boilerService from "../../services/boilers/boilerService";
-import { w } from "@faker-js/faker/dist/airline-CBNP41sR";
 
 export const TaskController = {
   getAllTaskToday: async (

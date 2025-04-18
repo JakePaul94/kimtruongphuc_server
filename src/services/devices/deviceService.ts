@@ -43,42 +43,16 @@ const getDeviceById = async (
   return Device.findByPk(id, includeOptions);
 };
 
-const getAllDevices = async (
-  options: {
-    filter?: Partial<DeviceAttributes>;
-    limit?: number;
-    offset?: number;
-    order?: Array<[string, string]>;
-    include?: any[];
-  } = {}
-): Promise<{ rows: DeviceInstance[]; count: number }> => {
-  const { filter = {}, limit, offset, order, include = [] } = options;
-
-  const whereCondition: any = {};
-  for (const key in filter) {
-    if (
-      Object.prototype.hasOwnProperty.call(filter, key) &&
-      filter[key as keyof DeviceAttributes] !== undefined
-    ) {
-      if (typeof filter[key as keyof DeviceAttributes] === "string") {
-        whereCondition[key] = {
-          [Op.like]: `%${filter[key as keyof DeviceAttributes]}%`,
-        };
-      } else {
-        whereCondition[key] = filter[key as keyof DeviceAttributes];
-      }
-    }
+const getAllDevices = async (): Promise<DeviceAttributes[]> => {
+  try {
+    const devices = await Device.findAll({ raw: true });
+    return devices;
+  } catch (error) {
+    console.error('Lỗi khi lấy tất cả thiết bị:', error);
+    throw error;
   }
-
-  return Device.findAndCountAll({
-    where: whereCondition,
-    limit,
-    offset,
-    order,
-    include,
-    distinct: true,
-  });
 };
+
 
 const updateDevice = async (
   id: number,

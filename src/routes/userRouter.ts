@@ -14,7 +14,6 @@ userRouter.get("/:id",requireRole('admin'), userController.getUserById);
 userRouter.post(
   "/create",
   requireRole("admin"),
-  upload.single("avatar"),
   userController.createUser
 );
 

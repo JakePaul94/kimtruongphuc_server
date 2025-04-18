@@ -7,7 +7,9 @@ import { AuthRequest } from "../../types/authType";
 export const deviceController = {
   createDevice: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(req.body)
       const device = await deviceService.createDevice(req.body);
+      
       res.status(201).json(device);
     } catch (err) {
       next(err);
@@ -16,13 +18,7 @@ export const deviceController = {
 
   getAllDevices: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { limit, offset, order, ...filter } = req.query;
-      const result = await deviceService.getAllDevices({
-        limit: limit ? parseInt(limit as string) : undefined,
-        offset: offset ? parseInt(offset as string) : undefined,
-        order: order ? JSON.parse(order as string) : undefined,
-        filter: filter as any,
-      });
+      const result = await deviceService.getAllDevices();
       res.json(result);
     } catch (err) {
       next(err);

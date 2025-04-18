@@ -40,44 +40,32 @@ const userController = {
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    let filePath: string | undefined;
     try {
       const userData = req.body;
-
+  
       if (
-        !userData.password ||
+        !userData.phoneNumber ||
         !userData.email ||
         !userData.fullName
       ) {
         throw new ApiError(400, "Missing required fields.");
       }
-
-      if (req.file) {
-        const fileName = req.file.filename;
-        const fileUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
-        userData.profilePicture = fileUrl;
-      }
-
+  
+      // Tự động tạo password từ số điện thoại
+      userData.password = `${userData.PhoneNumber}@`;
+  
       const newUser = await userService.createUser(userData);
-
-      res.status(201).json({
-        message: "User created successfully",
-        user: newUser,
-      });
+  
+      res.status(201).json(newUser);
     } catch (error: any) {
       console.error("Error in createUser controller:", error);
-      if (filePath) {
-        fs.unlink(filePath, (err) => {
-          if (err) console.error("Error deleting file:", err);
-        });
-      }
       if (error.message === "Username or email already exists.") {
         throw new ApiError(409, error.message);
       } else {
         next(error);
       }
     }
-  },
+  }
 };
 
 export default userController;

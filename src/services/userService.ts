@@ -1,19 +1,22 @@
 import { models} from "../config/database";
 import bcrypt from "bcrypt";
 import { ApiError } from "../utils/ApiError"; // Import ApiError
+import { UserAttributes } from "../models/userModel";
 const User = models.User;
 
 const userService = {
-  getAllUsers: async () => {
+  getAllUsers: async (): Promise<Omit<UserAttributes, 'password'>[]> => {
     try {
-      const users = await User.findAll({
-        attributes: ["id", "fullName", "email", "phoneNumber", "role","profilePicture"],
+      const users = await User.findAll();
+  
+      const plainUsers = users.map((user) => {
+        const { password, ...rest } = user.get({ plain: true });
+        return rest;
       });
-      const plainUsers = users.map((user) => user.get({ plain: true }));
-      console.log(plainUsers);
-      return users;
+  
+      return plainUsers;
     } catch (error: any) {
-      console.error("Error fetching users with managers:", error);
+      console.error("Error fetching users:", error);
       throw new ApiError(500, "Failed to fetch users.");
     }
   },

@@ -82,7 +82,7 @@ const waterReportService = {
   ): Promise<WaterReportTemplateInstance> => {
     const { name, boilerId, description, items } = data;
 
-    // Chuẩn bị dữ liệu items
+    console.log("dữ liệu khởi tạo",data)
     const itemsToCreate =
       items?.map((itemInput) => {
         if (!itemInput.label) {
@@ -146,32 +146,62 @@ const waterReportService = {
   },
 
   // Cập nhật template (chỉ các trường chính, không xử lý items phức tạp ở đây)
-  updateTemplate: async (
-    id: number,
-    data: Partial<WaterReportTemplateAttributes>
-  ): Promise<WaterReportTemplateInstance> => {
+  updateTemplate: async (id: number, data: any) => {
     const template = await WaterReportTemplate.findByPk(id);
-    if (!template) throw new ApiError(404, "Water report template not found");
+    if (!template) {
+      throw new ApiError(404, 'Water report template not found');
+    }
 
-    // Chỉ cập nhật các trường của chính Template
-    const { items, boilerId, ...templateData } = data as any; // Loại bỏ items và boilerId nếu không cho phép sửa
+    const { items, boilerId, ...templateData } = data;
+
+    // Prevent updating boilerId here
+    if (boilerId !== undefined && boilerId !== template.boilerId) {
+      console.warn('Attempted to update boilerId via updateTemplate. Ignoring.');
+    }
+    const safeTemplateData = { ...templateData };
     if (boilerId !== undefined) {
-      console.warn(
-        "Attempted to update boilerId via updateTemplate. Ignoring."
-      );
-    }
-    if (items !== undefined) {
-      console.warn(
-        "Updating template items requires dedicated logic. 'items' field ignored in this update."
-      );
+      safeTemplateData.boilerId = template.boilerId; // Keep the original boilerId
     }
 
-    await template.update(templateData);
+    // Update the template's basic information
+    await template.update(safeTemplateData);
+
+    if (items && Array.isArray(items)) {
+      const existingItems = await WaterReportTemplateItem.findAll({
+        where: { templateId: id },
+      });
+
+      const updatedItemIds = new Set<number>();
+
+      // Process each item in the provided array
+      for (const itemData of items) {
+        if (itemData.id) {
+          // Update existing item
+          const existingItem = existingItems.find((item) => item.id === itemData.id);
+          if (existingItem) {
+            await existingItem.update(itemData);
+            updatedItemIds.add(itemData.id);
+          } else {
+            console.warn(`Item with ID ${itemData.id} not found for template ${id}.`);
+          }
+        } else {
+          // Create a new item
+          await WaterReportTemplateItem.create({ ...itemData, templateId: id });
+        }
+      }
+
+      // Remove items that are not in the updated list
+      const itemsToRemove = existingItems.filter((item) => !updatedItemIds.has(item.id));
+
+      for (const itemToRemove of itemsToRemove) {
+        await itemToRemove.destroy();
+      }
+    }
 
     return await template.reload({
       include: [
-        { model: WaterReportTemplateItem, as: "items" },
-        { model: Boiler, as: "boiler" },
+        { model: WaterReportTemplateItem, as: 'items' },
+        { model: Boiler, as: 'boiler' },
       ],
     });
   },

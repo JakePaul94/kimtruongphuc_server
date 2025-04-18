@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "outDir": "./dist", // <<< Đây là dòng quan trọng: Chỉ định thư mục output là ./dist
     "rootDir": "./src",
     "esModuleInterop": true,
