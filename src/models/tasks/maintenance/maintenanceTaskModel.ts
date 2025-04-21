@@ -22,6 +22,7 @@ export interface MaintenanceTaskCreationAttributes
 export interface MaintenanceTaskInstance
   extends Model<MaintenanceTaskAttributes, MaintenanceTaskCreationAttributes>,
     MaintenanceTaskAttributes {
+  items: any;
   createdAt?: Date;
   updatedAt?: Date;
 }

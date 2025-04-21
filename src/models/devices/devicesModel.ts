@@ -38,7 +38,7 @@ export interface DeviceAttributes {
 
 export interface DeviceInstance
   extends Model<DeviceAttributes>,
-    DeviceAttributes {}
+  DeviceAttributes { }
 
 const DeviceModel = (sequelize: Sequelize) => {
   const Device = sequelize.define<DeviceInstance>(
@@ -120,6 +120,18 @@ const DeviceModel = (sequelize: Sequelize) => {
     Device.hasMany(models.DeviceDocument, {
       foreignKey: "deviceId",
       as: "documents",
+    }); 
+    Device.belongsToMany(models.Boiler, {
+      through: models.BoilerDevice, // Sử dụng model BoilerDevice làm bảng trung gian
+      as: 'boilers',               // Alias để truy cập các boilers liên quan đến device
+      foreignKey: 'deviceId',      // Foreign key trong bảng BoilerDevice trỏ đến Device
+      otherKey: 'boilerId',        // Foreign key trong bảng BoilerDevice trỏ đến Boiler
+    });
+
+    // Thêm association hasMany với BoilerDevice để có thể include nó trực tiếp
+    Device.hasMany(models.BoilerDevice, {
+      foreignKey: 'deviceId',
+      as: 'boilerDevices',
     });
   };
 

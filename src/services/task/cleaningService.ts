@@ -396,37 +396,15 @@ const cleaningService = {
     });
   },
   getAvailableTasksForMyBoilers: async (
-    userId: number,
+    boilerId: number,
     date: string
   ): Promise<CleaningTaskInstance[]> => {
     try {
-      // 1. Tìm các boilerId mà user này được phép làm việc
-      const userBoilers = await BoilerUser.findAll({
-        where: { userId: userId },
-        attributes: ["boilerId"], // Chỉ lấy boilerId
-        raw: true, // Lấy kết quả dạng object đơn giản
-      });
-
-      const boilerIds = userBoilers.map(
-        (ub: { boilerId: number }) => ub.boilerId
-      );
-
-      // Nếu user không thuộc lò nào, trả về mảng rỗng
-      if (boilerIds.length === 0) {
-        console.log(`User ${userId} is not associated with any boilers.`);
-        return [];
-      }
-
-      console.log(
-        `User ${userId} belongs to boilers: ${boilerIds.join(
-          ", "
-        )}. Fetching available tasks for date ${date}.`
-      );
-
-      // 2. Tìm các CleaningTask thỏa mãn điều kiện
+     
+      console.log(boilerId ,".....",date)
       const availableTasks = await CleaningTask.findAll({
         where: {
-          boilerId: { [Op.in]: boilerIds }, // Thuộc các lò của user
+          boilerId: boilerId, // Thuộc các lò của user
           scheduledDate: date, // Đúng ngày
           assignedTo: null, // Chưa được ai nhận (claim)
           status: "pending", // Chỉ lấy task chưa bắt đầu
@@ -474,12 +452,12 @@ const cleaningService = {
         ],
       });
       console.log(
-        `Found ${availableTasks.length} available tasks for user ${userId} on ${date}.`
+        `Found ${availableTasks.length} available tasks for user  on ${date}.`
       );
       return availableTasks;
     } catch (error: any) {
       console.error(
-        `Error fetching available tasks for user ${userId} on date ${date}:`,
+        `Error fetching available tasks for user  on date ${date}:`,
         error
       );
       throw new ApiError(
@@ -491,7 +469,7 @@ const cleaningService = {
   // --- SỬA ĐỔI createTask ---
   createTask: async (data: any) => {
     const { boilerId, createdBy, templateId, scheduledDate, assignedTo } = data;
-    
+
     if (!templateId) {
       throw new ApiError(
         400,

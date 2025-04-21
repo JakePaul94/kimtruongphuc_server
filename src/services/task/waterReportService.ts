@@ -82,7 +82,7 @@ const waterReportService = {
   ): Promise<WaterReportTemplateInstance> => {
     const { name, boilerId, description, items } = data;
 
-    console.log("dữ liệu khởi tạo",data)
+    console.log("dữ liệu khởi tạo", data)
     const itemsToCreate =
       items?.map((itemInput) => {
         if (!itemInput.label) {
@@ -352,73 +352,26 @@ const waterReportService = {
   },
   // Lấy các task còn trống (chưa assign) cho các lò hơi mà user quản lý
   getAvailableTasksForMyBoilers: async (
-    userId: number,
+    boilerId: number,
     date: string // Format 'YYYY-MM-DD'
   ): Promise<WaterReportTaskInstance[]> => {
     try {
-      // 1. Tìm boilerIds của user
-      const userBoilers = await BoilerUser.findAll({
-        where: { userId: userId },
-        attributes: ["boilerId"],
-        raw: true,
-      });
-      const boilerIds = userBoilers.map(
-        (ub: { boilerId: number }) => ub.boilerId
-      );
-      console.log(boilerIds)
-      if (boilerIds.length === 0) {
-        console.log(`User ${userId} is not associated with any boilers.`);
-        return [];
-      }
 
-      // 2. Tìm WaterReportTask thỏa mãn
       const availableTasks = await WaterReportTask.findAll({
         where: {
-          boilerId: { [Op.in]: boilerIds },
+          boilerId:  boilerId ,
           scheduledDate: date,
-          assignedTo: null, // Chưa được gán
-          status: "pending", // Chỉ lấy task chưa bắt đầu
-        },
-        include: [
-          // Include đầy đủ thông tin cần thiết
-          {
-            model: WaterReportTaskItem,
-            as: "items",
-            attributes: { exclude: ["updatedAt"] },
-            include: [
-              {
-                model: WaterReportTemplateItem,
-                as: "templateItem",
-                attributes: ["id", "label", "description"],
-              },
-            ],
-          },
-          {
-            model: User,
-            as: "creator",
-            attributes: ["id", "fullName", "email"],
-          },
-          {
-            model: Boiler,
-            as: "boiler",
-            attributes: ["id", "name", "location"],
-          },
-          {
-            model: WaterReportTemplate,
-            as: "template",
-            attributes: ["id", "name"],
-          },
-          // Không cần include assignee vì đang là NULL
-        ],
-        order: [["createdAt", "ASC"]],
-      });
+          assignedTo: null, 
+          status: "pending", 
+        }
+      })
       console.log(
-        `Found ${availableTasks.length} available water report tasks for user ${userId} on ${date}.`
+        `Found ${availableTasks.length} available water report tasks for user  on ${date}.`
       );
       return availableTasks;
     } catch (error: any) {
       console.error(
-        `Error fetching available water report tasks for user ${userId} on date ${date}:`,
+        `Error fetching available water report tasks for user  on date ${date}:`,
         error
       );
       throw new ApiError(

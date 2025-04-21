@@ -15,8 +15,11 @@ import cleaningRouter from "./routes/tasks/cleaningRouter";
 import incidentRouter from "./routes/incidentReport.routes";
 import path from "path";
 import taskRouter from "./routes/tasks/taskRouter";
-import waterReportRouter from "./routes/tasks/waterReportRouer";
+import waterReportRouter from "./routes/tasks/waterReportRouter";
 import uploadRouter from "./routes/uploadRouter";
+
+import "./scripts/createTaskEveryDay"
+import imgRouter from "./routes/imgRouter";
 
 dotenv.config();
 
@@ -32,6 +35,7 @@ app.use(morgan("dev"));
 app.use("/static", express.static(path.join(__dirname,"..", "uploads")));
 app.use('/api/uploads', uploadRouter);
 
+
 app.use("/users", userRoutes);
 app.use("/auth", authRouter);
 app.use("/devices", deviceRouter);
@@ -43,7 +47,7 @@ app.use("/cleaning-tasks", cleaningRouter);
 app.use("/water-report-tasks", waterReportRouter);
 app.use("/incident-reports", incidentRouter); 
 app.use("/tasks", taskRouter);
-
+app.use('/img-process',imgRouter)
 app.get("/", (req, res) => {
   res.send("Hello World with Express, TypeScript, Sequelize!");
 });

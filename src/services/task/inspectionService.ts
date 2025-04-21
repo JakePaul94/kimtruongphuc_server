@@ -8,7 +8,7 @@ const {
   InspectionTemplateItem,
   InspectionTask,
   InspectionTaskItem,
-  Device,
+  Device,BoilerDevice
 } = models;
 
 const inspectionService = {
@@ -73,7 +73,14 @@ const inspectionService = {
         {
           model: Device,
           as: "device",
-          where: { boilerId },
+          include: [ // Thêm một include nữa để tham gia với BoilerDevice
+            {
+              model: BoilerDevice,
+              as: "boilerDevices", // Tên alias cho association BoilerDevice trong model Device
+              where: { boilerId },
+              attributes: [], // Không cần lấy bất kỳ thuộc tính nào từ bảng trung gian
+            },
+          ],
         },
       ],
     });

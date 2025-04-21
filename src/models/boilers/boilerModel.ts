@@ -9,7 +9,7 @@ export interface BoilerAttributes {
 
 export interface BoilerInstance
   extends Model<BoilerAttributes>,
-    BoilerAttributes {}
+  BoilerAttributes { }
 
 const BoilerModel = (sequelize: Sequelize) => {
   const Boiler = sequelize.define<BoilerInstance>(
@@ -35,6 +35,7 @@ const BoilerModel = (sequelize: Sequelize) => {
     WaterReportTask: ModelStatic<Model>;
     CleaningTemplate: ModelStatic<Model>;
     WaterReportTemplate: ModelStatic<Model>;
+    Device: ModelStatic<Model>;
   }) => {
     Boiler.hasMany(models.BoilerUser, {
       foreignKey: "boilerId",
@@ -42,11 +43,6 @@ const BoilerModel = (sequelize: Sequelize) => {
       onDelete: "CASCADE",
     });
 
-    Boiler.hasMany(models.BoilerDevice, {
-      foreignKey: "boilerId",
-      as: "devices",
-      onDelete: "CASCADE",
-    });
 
     Boiler.hasMany(models.CleaningTask, {
       foreignKey: "boilerId",
@@ -72,6 +68,16 @@ const BoilerModel = (sequelize: Sequelize) => {
       foreignKey: "boilerId",
       as: "adHocTasks",
       onDelete: "CASCADE",
+    }); Boiler.belongsToMany(models.Device, {
+      through: models.BoilerDevice,
+      as: 'devices',
+      foreignKey: 'boilerId',
+      otherKey: 'deviceId',
+    });
+
+    Boiler.hasMany(models.BoilerDevice, {
+      foreignKey: 'boilerId',
+      as: 'boilerDevices',
     });
   };
 

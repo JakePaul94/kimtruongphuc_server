@@ -21,12 +21,7 @@ const boilerService = {
 
   getBoilerById: async (id: number) => {
     try {
-      const boiler = await Boiler.findByPk(id, {
-        include: [
-          { model: BoilerUser, as: "users" },
-          { model: BoilerDevice, as: "devices" },
-        ],
-      });
+      const boiler = await Boiler.findByPk(id);
       if (!boiler) {
         throw new ApiError(404, `Boiler with ID ${id} not found.`);
       }

@@ -7,28 +7,52 @@ import waterReportService from "../../services/task/waterReportService";
 import { ApiError } from "../../utils/ApiError"; // Import ApiError nếu chưa có
 import { AuthRequest } from "../../types/authType";
 import boilerService from "../../services/boilers/boilerService";
+import { formatDateToYYYYMMDD } from "../../utils/timeHelpers";
 
 export const TaskController = {
+  test:async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  )=>{
+    const user = req.user;
+    if (!user) {
+      return next(new ApiError(401, "Unauthorized"));
+    }
+    try {
+      const today = formatDateToYYYYMMDD(new Date(Date.now()))
+      const boilerId =await boilerService.getBoilerIdByUserId(user.id)
+      const adHocTaskById = await   waterReportService.getAvailableTasksForMyBoilers(
+        boilerId,
+        today
+      )
+      res.status(200).json(adHocTaskById)
+    } catch (error) {
+      console.log(error)
+    }
+       
+  },
   getAllTaskToday: async (
     req: AuthRequest,
     res: Response,
     next: NextFunction
   ) => {
     const user = req.user;
-    const dateFromQuery = req.query.date as string;
+    const today = formatDateToYYYYMMDD(new Date(Date.now()))
     const allTasks: any[] = []; // Assuming date is always present
     if (!user) {
       return next(new ApiError(401, "Unauthorized"));
     }
     try {
       const boilerId = await boilerService.getBoilerIdByUserId(user.id);
+      const myBoiler = await boilerService.getBoilerById(boilerId)
       const cleaningTaskById = await cleaningService.getAssignedTasksByDate(
         user.id,
-        dateFromQuery
+        today
       );
       const adHocTaskById = await adHocTaskService.getTasksByUserAndDate(
         user.id,
-        dateFromQuery
+        today
       );
 
       cleaningTaskById.forEach((task) => {
@@ -36,7 +60,7 @@ export const TaskController = {
           id: task.id,
           type: "cleaning",
           assignmentType: "assigned",
-          title: `Vệ sinh lò hơi ${task.boilerId}`,
+          title: `Vệ sinh lò hơi ${myBoiler.name}`,
           description: null,
           scheduledDate: task.scheduledDate,
           status: task.status,
@@ -79,20 +103,20 @@ export const TaskController = {
         ] = await Promise.all([
           cleaningService.getAvailableTasksForMyBoilers(
             boilerId,
-            dateFromQuery
+            today
           ),
-          adHocTaskService.getTasksByBoilerAndDate(boilerId, dateFromQuery),
+          adHocTaskService.getTasksByBoilerAndDate(boilerId, today),
           inspectionService.getInspectionTasksByBoilerAndDate(
             boilerId,
-            dateFromQuery
+            today
           ),
           maintenanceService.getMaintenanceTasksByBoilerAndDate(
             boilerId,
-            dateFromQuery
+            today
           ),
           waterReportService.getAvailableTasksForMyBoilers(
-            user.id,
-            dateFromQuery
+            boilerId,
+            today
           ),
         ]);
 
@@ -101,7 +125,7 @@ export const TaskController = {
             id: task.id,
             type: "cleaning",
             assignmentType: "available",
-            title: `Vệ sinh lò hơi ${task.boilerId}`,
+            title: `Vệ sinh lò hơi ${myBoiler.name}`,
             description: null,
             scheduledDate: task.scheduledDate,
             status: task.status,
@@ -176,7 +200,7 @@ export const TaskController = {
             id: task.id,
             type: "water-report",
             assignmentType: "available",
-            title: `Báo cáo nước ${task.boilerId}`,
+            title: `Báo cáo nước ${myBoiler.name}`,
             description: null,
             scheduledDate: task.scheduledDate,
             status: task.status,
@@ -196,6 +220,6 @@ export const TaskController = {
       console.error("Error fetching all tasks for today:", error);
       return next(new ApiError(500, "Failed to fetch tasks for today."));
     }
-  },
+  }
 };
 export default TaskController;

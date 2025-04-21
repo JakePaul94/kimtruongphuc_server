@@ -5,5 +5,5 @@ const taskRouter = express.Router();
 import { isAuthenticated } from "../../middlewares/authMiddleware";
 
 taskRouter.get('/today',isAuthenticated, taskController.getAllTaskToday);
-
+taskRouter.get('/test',isAuthenticated, taskController.test);
 export default taskRouter;

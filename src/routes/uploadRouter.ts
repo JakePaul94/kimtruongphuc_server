@@ -17,7 +17,11 @@ uploadRouter.post(
   uploadImage.single("image"), // 2. Dùng Multer xử lý file upload từ field có tên 'imageFile'
   uploadController.handleImageUpload // 3. Gọi controller để xử lý kết quả và trả về URL
 );
-
+uploadRouter.delete(
+  "/image",                // /api/uploads/image (method DELETE)
+  isAuthenticated,
+  uploadController.handleImageDelete
+);
 // Thêm các route upload khác nếu cần (ví dụ: /document)
 // uploadRouter.post(
 //   "/document",

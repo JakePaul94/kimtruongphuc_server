@@ -2,6 +2,8 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "../types/authType"; // Import AuthRequest nếu bạn dùng req.user
 import { ApiError } from "../utils/ApiError";
+import fs from "fs";
+import path from "path";
 
 export const uploadController = {
   handleImageUpload: async (
@@ -51,8 +53,52 @@ export const uploadController = {
            next(new ApiError(500, "An unknown error occurred during image upload."));
       }
     }
-  },
+  }
+  ,
+  handleImageDelete: async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { imageUrl } = req.body;
 
+      if (!imageUrl) {
+        throw new ApiError(400, "Image URL is required.");
+      }
+
+      // Giải mã URL => lấy ra filename từ public path
+      // Ví dụ: /static/images/abc123.png => abc123.png
+      const publicPathPrefix = "/static/images/";
+      if (!imageUrl.includes(publicPathPrefix)) {
+        throw new ApiError(400, "Invalid image URL format.");
+      }
+
+      const filename = imageUrl.split(publicPathPrefix)[1];
+      const filePath = path.join(__dirname, "..", "uploads", "images", filename);
+
+      // Kiểm tra file tồn tại và xóa
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting image:", err);
+          return next(new ApiError(500, "Failed to delete image file."));
+        }
+
+        res.status(200).json({
+          message: "Image deleted successfully",
+          deletedFile: filename,
+        });
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        next(error);
+      } else if (error instanceof Error) {
+        next(new ApiError(500, `Image deletion failed: ${error.message}`));
+      } else {
+        next(new ApiError(500, "Unknown error occurred during image deletion."));
+      }
+    }
+  }
   // Thêm các hàm xử lý upload loại file khác nếu cần
   // handleDocumentUpload: async (...) => { ... }
 };

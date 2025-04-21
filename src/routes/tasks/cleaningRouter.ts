@@ -65,8 +65,7 @@ cleaningRouter.put(
 // --- ROUTE MỚI: Hoàn thành một vị trí trong task ---
 cleaningRouter.put(
   "/tasks/locations/:locationId/complete", // Dùng path param cho locationId
-  isAuthenticated, // 1. Xác thực người dùng
-  uploadCleaningPhoto.single("photo"), // 2. Xử lý upload 1 file ảnh với field name là 'photo'
+  isAuthenticated, 
   cleaningController.completeTaskLocation // 3. Gọi controller xử lý
 );
 // -------------------------------------------------

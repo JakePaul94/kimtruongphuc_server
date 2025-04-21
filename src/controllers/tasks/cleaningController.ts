@@ -240,17 +240,7 @@ export const cleaningController = {
         throw new ApiError(401, "Authentication required.");
       }
 
-      // Kiểm tra file ảnh đã upload chưa
-      if (!req.file) {
-        throw new ApiError(400, "Verification photo is required.");
-      }
-
-      // Lấy đường dẫn hoặc URL của ảnh từ req.file
-      // Cách lấy chính xác phụ thuộc vào cấu hình Multer và cách bạn muốn lưu URL
-      // Ví dụ: Lưu URL tương đối để client tự nối với base URL
-      const photoUrl = `/uploads/cleaning_photos/${req.file.filename}`; // Ví dụ
-
-      const { notes } = req.body; // Lấy ghi chú từ body (nếu có)
+      const { notes,photoUrl } = req.body; // Lấy ghi chú từ body (nếu có)
 
       const updatedLocation = await cleaningService.completeTaskLocation(
         locationId,

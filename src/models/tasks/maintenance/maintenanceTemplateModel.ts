@@ -9,9 +9,8 @@ import {
   // 1. Attributes
   export interface MaintenanceTemplateAttributes {
     id: number;
-    name: string;
+    title: string;
     description?: string | null;
-    deviceType: string;
   }
   
   // 2. CreationAttributes
@@ -36,17 +35,13 @@ import {
           autoIncrement: true,
           primaryKey: true,
         },
-        name: {
+        title: {
           type: DataTypes.STRING,
           allowNull: false,
         },
         description: {
           type: DataTypes.TEXT,
           allowNull: true,
-        },
-        deviceType: {
-          type: DataTypes.STRING,
-          allowNull: false,
         },
       },
       {
